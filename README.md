@@ -252,7 +252,7 @@ Using Python's yaml and json modules, read in yaml and output json. Useful becau
 
 # zipf.py
 
-Print out the most common words in a given plain text document.
+Print out the most common words in a plain text document.
 
     cd ~/corpora/heliohost
     zipf.py Fre_Newspapers.txt

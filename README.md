@@ -229,6 +229,8 @@ Using `pyPdf`, open up a PDF, cropping the left and right sides right down the m
 
     vsplitpdf.py reconstruction.pdf
 
+A quick `pip install pyPdf` may be required.
+
 # whois-domain-yaml
 
 Using a Yaml file formatted something like this:

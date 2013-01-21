@@ -12,10 +12,10 @@ parser.add_argument('original', help='The PDF you want to add a stamp to')
 parser.add_argument('stamp', help='The watermark PDF')
 opts = parser.parse_args()
 
-_, first_page = tempfile.mkstemp(suffix='pdf')
+_, first_page = tempfile.mkstemp(suffix='.pdf')
 sh(['pdftk', opts.original, 'cat', '1', 'output', first_page])
 
-_, first_page_stamped = tempfile.mkstemp(suffix='pdf')
+_, first_page_stamped = tempfile.mkstemp(suffix='.pdf')
 sh(['pdftk', first_page, 'stamp', opts.stamp, 'output', first_page_stamped])
 
 stamped = opts.original.replace('.pdf', '-stamped.pdf')

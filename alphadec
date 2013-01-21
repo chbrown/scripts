@@ -1,0 +1,13 @@
+#!/usr/bin/env python
+import random
+import argparse
+
+parser = argparse.ArgumentParser(description='Generate random characters.')
+parser.add_argument('--length', '-l', type=int, help='Length of each password', default=12)
+parser.add_argument('--count', '-c', type=int, help='Number of passwords', default=1)
+args = parser.parse_args()
+
+ALPHADEC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+
+for i in range(args.count):
+    print ''.join(random.sample(ALPHADEC, args.length))

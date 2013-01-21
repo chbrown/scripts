@@ -1,0 +1,31 @@
+#!/usr/bin/env python
+import os
+import subprocess
+import argparse
+import errno
+
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc:
+        if exc.errno != errno.EEXIST:
+            raise
+
+def sh(args):
+    print '$ %s' % ' '.join(args)
+    subprocess.check_output(args)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='SSHFS setup tool.')
+    parser.add_argument('remote')
+    parser.add_argument('local', nargs='?')
+    opts = parser.parse_args()
+
+    remote_flat = opts.remote.replace(':/', '/').replace(':', '/home/')
+    local = opts.local or '/Volumes/%s' % remote_flat
+    mkdir_p(local)
+
+    sh(['sshfs', opts.remote, local])
+
+# rec for speeding up:
+# sshfs -o workaround=nodelaysrv -o cache_stat_timeout=600 -o uid=1000 -o idmap=user -o Ciphers=arcfour $1:/$2 /home/bluszcz/servers/$1

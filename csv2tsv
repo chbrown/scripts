@@ -1,0 +1,6 @@
+#!/usr/bin/env python
+import csv, fileinput, sys
+
+tsv = csv.writer(sys.stdout, csv.excel_tab)
+for row in csv.reader(fileinput.input(mode='rU')):
+    tsv.writerow(row)

@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+# import paramiko
+from subprocess import Popen
+import redis
+
+# cmd = "sudo /etc/init.d/mediatomb restart"
+
+# rsa_key = paramiko.RSAKey.from_private_key_file('/Users/chbrown/.ssh/id_rsa')
+# ssh = paramiko.SSHClient()
+# ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+# ssh.connect('dark')
+# stdin, stdout, stderr = ssh.exec_command('redis-cli ')
+# print stdout.read()
+# ssh.close()
+
+host = 'dark'
+key_expression = 'forex:*'
+
+p = Popen(['ssh', '-L', '16379:localhost:6379', host, '-N'])
+
+remote = redis.StrictRedis(port=16379)
+local = redis.StrictRedis()
+
+keys = remote.keys(key_expression)
+values = remote.mget(keys)
+# args = [item for sublist in  for item in sublist]
+# print args
+local.mset(dict(zip(keys, values)))
+
+p.terminate()
+
+print 'Done'

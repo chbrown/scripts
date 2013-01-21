@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+import os, sys
+import yaml
+import json
+try:
+    Loader = yaml.CLoader
+    Dumper = yaml.CDumper
+except ImportError:
+    Loader = yaml.Loader
+    Dumper = yaml.Dumper
+
+if len(sys.argv) > 1 and os.path.exists(sys.argv[-1]):
+    with open(sys.argv[-1]) as fp:
+        document = yaml.load(fp, Loader=Loader)
+else:
+    document = yaml.load(sys.stdin, Loader=Loader)
+json.dump(document, sys.stdout)

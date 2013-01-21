@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+import os
+import argparse
+from glob import glob
+
+def flatten_glob_list(fileglobs):
+    for fileglob in fileglobs:
+        for filepath in glob(fileglob):
+            yield filepath
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='PDF Cropper')
+    parser.add_argument('files', nargs='*', default='*.pdf')
+    parser.add_argument('--force', action='store_true')
+    opts = parser.parse_args()
+    # print 'Cropping: %s' % opts.files
+
+    for filepath_orig in flatten_glob_list(opts.files):
+        if 'pdf' in filepath_orig and '-crop' not in filepath_orig:
+            filepath_cropped = filepath_orig.replace('.pdf', '-crop.pdf')
+            if opts.force or not os.path.exists(filepath_cropped):
+                os.system('pdfcrop --margins 2 --clip "%s" "%s"' % (filepath_orig, filepath_cropped))

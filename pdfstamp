@@ -1,0 +1,24 @@
+#!/usr/bin/env python
+import argparse
+import subprocess
+import tempfile
+
+def sh(args):
+    print '$ %s' % ' '.join(args)
+    return subprocess.check_call(args)
+
+parser = argparse.ArgumentParser(description='Watermark only the first page of a PDF with another PDF.')
+parser.add_argument('original', help='The PDF you want to add a stamp to')
+parser.add_argument('stamp', help='The watermark PDF')
+opts = parser.parse_args()
+
+_, first_page = tempfile.mkstemp(suffix='pdf')
+sh(['pdftk', opts.original, 'cat', '1', 'output', first_page])
+
+_, first_page_stamped = tempfile.mkstemp(suffix='pdf')
+sh(['pdftk', first_page, 'stamp', opts.stamp, 'output', first_page_stamped])
+
+stamped = opts.original.replace('.pdf', '-stamped.pdf')
+sh(['pdftk', 'O=%s' % opts.original, 'S=%s' % first_page_stamped, 'cat', 'S', 'O2-end', 'output', stamped])
+
+print 'Done.'

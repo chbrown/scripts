@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+launchctlname=`launchctl list | grep $1 | awk '{print $3}'`
+echo "launchctl start $launchctlname"
+launchctl start $launchctlname

@@ -1,0 +1,29 @@
+#!/usr/bin/env python
+import os
+# import subprocess
+import argparse
+
+# def run(*args):
+#     args = map(str, args)
+#     print '$ %s' % ' '.join(args)
+#     return subprocess.check_output(args)
+
+parser = argparse.ArgumentParser(description='PostgreSQL migration development tool')
+parser.add_argument('src', help='[SOURCE:]DATABASE')
+parser.add_argument('dst', help='[DESTINATION:]DATABASE = defaults to "localhost".')
+args = parser.parse_args()
+
+src_host, src_db = args.src.split(':') if ':' in args.src else ('localhost', args.src)
+dst_host, dst_db = args.dst.split(':') if ':' in args.dst else ('localhost', args.dst)
+
+if src_host == 'localhost' and dst_host == 'localhost':
+    os.system('pg_dump %s" | psql %s' % (src_db, dst_db))
+elif dst_host == 'localhost':
+    os.system('ssh -C %s "pg_dump %s" | psql %s' % (src_host, src_db, dst_db))
+elif src_host == 'localhost':
+    os.system('pg_dump %s | ssh -C %s "psql %s"' % (src_db, dst_host, dst_db))
+else:
+    print 'Sorry, remote-to-remote is not yet supported.'
+    # puts_system "sed 's/postgres/chbrown/g' #{local_path}.postgres_user > #{local_path}"
+    # puts_system "dropdb #{db} && createdb #{db}"
+    # puts_system "gunzip -c #{local_path} | psql #{db}"

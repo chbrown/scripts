@@ -1,0 +1,44 @@
+#!/usr/bin/env python
+import subprocess
+import re
+from datetime import datetime
+import argparse
+import redis
+import yaml
+
+client = redis.StrictRedis()
+
+searches = {
+    'updated': re.compile('Updat\w+ Date:\s*(\d+-\w+-\d+)', re.I),
+    'created': re.compile('Creat\w+ Date:\s*(\d+-\w+-\d+)', re.I),
+    'expires': re.compile('Expir\w+ Date:\s*(\d+-\w+-\d+)', re.I)
+}
+
+def whois(domain_name):
+    key = 'domains:%s' % domain_name
+    cached = client.get(key)
+    if not cached:
+        print 'Querying whois for %s' % domain_name
+        cached = subprocess.check_output(['whois', domain_name])
+        client.set(key, cached)
+        # cache for 1h only
+        client.expire(key, 60*60)
+    return cached
+
+def extract_date(whois_text, regex):
+    match = regex.search(whois_text)
+    # if not match: print 'Could not find %s for domain %s' % (attr, name)
+    value = match.group(1)
+    return datetime.strptime(value, '%d-%b-%Y')
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Get expiration dates for a yaml file of domains.')
+    parser.add_argument('file', default='/Users/chbrown/domains.yaml')
+    args = parser.parse_args()
+
+    sections = yaml.load(open(args.file))
+    domain_names = sum(sections.values(), [])
+    expirations = [extract_date(whois(domain_name), searches['expires']) for domain_name in domain_names]
+
+    for expiration, domain_name in sorted(zip(expirations, domain_names)):
+        print '%s\t%s' % (expiration.strftime('%Y-%m-%d'), domain_name)

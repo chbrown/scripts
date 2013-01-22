@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=$2 -f $1

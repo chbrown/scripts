@@ -3,22 +3,41 @@ import argparse
 import subprocess
 import tempfile
 
-def sh(args):
+def sh(*args):
+    args = map(str, args)
     print '$ %s' % ' '.join(args)
     return subprocess.check_call(args)
 
-parser = argparse.ArgumentParser(description='Watermark only the first page of a PDF with another PDF.')
+parser = argparse.ArgumentParser(description='Watermark only the selected page of a PDF with another PDF.')
 parser.add_argument('original', help='The PDF you want to add a stamp to')
 parser.add_argument('stamp', help='The watermark PDF')
+parser.add_argument('--page', type=int, default=1, help='The page to watermark')
 opts = parser.parse_args()
 
-_, first_page = tempfile.mkstemp(suffix='.pdf')
-sh(['pdftk', opts.original, 'cat', '1', 'output', first_page])
+_, selected_page = tempfile.mkstemp(suffix='.pdf')
+sh('pdftk', opts.original, 'cat', opts.page, 'output', selected_page)
 
-_, first_page_stamped = tempfile.mkstemp(suffix='.pdf')
-sh(['pdftk', first_page, 'stamp', opts.stamp, 'output', first_page_stamped])
+_, selected_page_stamped = tempfile.mkstemp(suffix='.pdf')
+sh('pdftk', selected_page, 'stamp', opts.stamp, 'output', selected_page_stamped)
 
 stamped = opts.original.replace('.pdf', '-stamped.pdf')
-sh(['pdftk', 'O=%s' % opts.original, 'S=%s' % first_page_stamped, 'cat', 'S', 'O2-end', 'output', stamped])
+if '-unstamped' in opts.original:
+    stamped = opts.original.replace('-unstamped', '')
+
+before = 'O0-%d' % (opts.page - 1)
+after = 'O%d-end' % (opts.page + 0)
+
+args = ['pdftk', 'O=%s' % opts.original, 'S=%s' % selected_page_stamped, 'cat']
+
+if opts.page == 1:
+    args += ['S', 'O2-end']
+elif opts.page == 2:
+    args += ['01', 'S', 'O3-end']
+elif opts.page > 2:
+    args += ['01-%d' % (opts.page - 1), 'S', 'O%d-end' % (opts.page + 1)]
+# stop here because I'm lazy
+
+args += ['output', stamped]
+sh(*args)
 
 print 'Done.'

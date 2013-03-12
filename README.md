@@ -2,6 +2,10 @@
 
 Except for `htpasswd.py`, `soundcloud`, and `transpose` all of these scripts were written by me and are Copyright 2012-2013 Christopher Brown, released here under the MIT License.
 
+## Prereqs:
+
+    pip install requests
+
 # alphadec
 
 Create 10 alphadecimal passwords of length 16 each.
@@ -187,7 +191,7 @@ Little helper for the awesome `sshfs` tool that OS X Fuse provides. It'll make t
 
 # soundcloud
 
-Python rendition of Luka Pusic's soundcloud.sh downloader. His wasn't unescaping higher order Unicode character escapes. Well, the Mac OS X filesystem totally supports UTF-8, and this scripts does too.
+Python rendition of Luka Pusic's soundcloud.sh downloader. His wasn't unescaping higher order Unicode character escapes. Well, the Mac OS X filesystem totally supports UTF-8, and this script does too.
 
     soundcloud https://soundcloud.com/oskmusic
 

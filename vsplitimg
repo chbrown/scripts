@@ -1,16 +1,34 @@
 #!/usr/bin/env python
 import os
+import re
+import argparse
 from PIL import Image
 
-for filename in os.listdir('.'):
-    image = Image.open(filename)
+extension_re = re.compile(r'(\.\w{2,5})$')
+
+parser = argparse.ArgumentParser(description='Image cropper (uses PIL)')
+parser.add_argument('filepaths', nargs='+')
+parser.add_argument('-d', '--destination')
+opts = parser.parse_args()
+
+
+for filepath in opts.filepaths:
+    image = Image.open(filepath)
     width, height = image.size
-    half_width = int(width / 2.0)
-    # left, upper, right, lower
-    left_box = (0, 0, half_width, height)
-    left = image.crop(left_box)
-    right_box = (half_width, 0, width, height)
-    right = image.crop(right_box)
-    filename = filename.replace('.jpg', '')
-    left.save(filename + "-left.jpg", "JPEG", quality=92)
-    right.save(filename + "-right.jpg", "JPEG", quality=92)
+    half_width = width // 2
+    # crops are specified as a "box" tuple of (left, upper, right, lower)
+    # origin (0, 0) is the top left
+    left = image.crop((0, 0, half_width, height))
+    right = image.crop((half_width, 0, width, height))
+    # , 'JPEG'
+    # we want to save with the same jpeg quantization table
+    # filename = filename.replace('jpg', 'png')
+    if opts.destination:
+        filepath = os.path.join(opts.destination, os.path.basename(filepath))
+
+    left_path = extension_re.sub(r'-left\1', filepath)
+    right_path = extension_re.sub(r'-right\1', filepath)
+
+    quality = 95
+    left.save(left_path, quality=quality)
+    right.save(right_path, quality=quality)

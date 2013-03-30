@@ -220,18 +220,35 @@ Like `ptx.sh`, but with a `latex` && `dvipdf` pipeline instead of `pdflatex`. In
 
     tx.sh so_many_trees
 
-# vsplit.py
+# vimeo-crawler
 
-Open all files in the current folder as images, split them into half, left and right, (like opening a normal book), and save as the original files suffixed with `-LEFT` or `-RIGHT`, saved as Jpegs with quality 92.
+Crawl vimeo for the most popular movies under a given channel, saving to `~/Movies/vimeo`:
+
+    vimeo-crawler --channels staffpicks
+
+The destination directory is created with `os.makedirs` if it doesn't exist. See `--help` for more options.
+
+Requires `requests`, `youtube-dl`, and `redis`:
+
+    pip install requests
+    brew install youtube-dl
+    brew install redis
+    launch redis
+
+# vsplitimg
+
+Open all files in the current folder as images, split them into half, left and right, (like opening a normal book), and save as the original filenames suffixed with `-left` or `-right`, JPEGs with quality 95.
 
     cd ~/Pictures/scans
-    vsplit.py
+    vsplitimg *.jpg
 
-# vsplitpdf.py
+Requires `PIL`: `brew install PIL` or `pip install -U PIL` if you're feeling optimistic
+
+# vsplitpdf
 
 Using `pyPdf`, open up a PDF, cropping the left and right sides right down the middle, into left and right. Create a new PDF with these crops.
 
-    vsplitpdf.py reconstruction.pdf
+    vsplitpdf reconstruction.pdf
 
 A quick `pip install pyPdf` may be required.
 

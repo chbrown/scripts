@@ -1,0 +1,100 @@
+#!/usr/bin/env python
+import os
+import redis
+import argparse
+import time
+import requests
+# from requests.exceptions import RequestException  # HTTPError, ConnectionError,
+
+headers = {
+    #'If-Modified-Since': datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S GMT'),
+    'Accept': 'text/html,application/xhtml+xml,application/xml,application/json',
+    'Accept-Charset': 'ISO-8859-1,utf-8',
+    'Cache-Control': 'max-age=0',
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/535.2 (KHTML, like Gecko) Chrome/15.0.874.121 Safari/535.2'
+}
+
+# "description": "12/24/11<br />\n<br />\n<br />\nDirector + Editor / Eliot Rausch<br />\nDirector of Photography / Matt B. Taylor<br />\nStory by / Eliot Rausch<br />\nWritten by / Amanda MacLachlan<br />\nProduced by / Jennette MacLachlan<br />\n<br />\nCast:<br />\nPregnant Woman / Arianna Papalexopoulos<br />\nMan / Alexi Papalexopoulos<br />\nDriver / Vince Pavia<br />\nBus Rider 1 / Chad Dennis<br />\nBus Rider 2 / Wolfgang Bodison\t\t<br />\nBus Rider 3 / Jason Shamburg \t\t\t<br />\n<br />\nOriginal Music / Adam Taylor<br />\nwww.ataylor.bandcamp.com<br />\n<br />\nLocation Scout / Jason Wood<br />\nProduction Assistant / Shawn Maguire<br />\nInspiration / Darren Rouanzoin<br />\nSpecial Thanks to / \u00dcber Content",
+# "duration": 223,
+# "embed_privacy": "anywhere",
+# "height": 720,
+# "id": 33635713,
+# "stats_number_of_comments": 160,
+# "stats_number_of_likes": 2303,
+# "stats_number_of_plays": 161963,
+# "title": "O NIGHT DIVINE",
+# "url": "http://vimeo.com/33635713",
+# "width": 1280
+
+queue_key = 'vimeo:queue'  # ZSET
+fetched_key = 'vimeo:fetched'  # SET
+
+
+def downloader(destination):
+    r = redis.StrictRedis()
+    while True:
+        for video_id, score in r.zrevrange(queue_key, 0, 0, withscores=True):
+            # print 'next', next
+            # video_id, score = next
+
+            # score = int(score)
+            output_format = '%08d-%s-%%(title)s.%%(ext)s' % (score, video_id)
+            output_path = os.path.join(destination, output_format)
+            cmd = 'youtube-dl -o "%s" --restrict-filenames http://vimeo.com/%s' % (output_path, video_id)
+            print cmd
+            exit_code = os.system(cmd)
+            if exit_code == 0:
+                # remove from queue
+                r.zrem(queue_key, video_id)
+                # add to fetched
+                r.sadd(fetched_key, video_id)
+            else:
+                raise Exception('youtube-dl exited with error code != 0')
+        else:
+            # no videos queued
+            time.sleep(1)
+
+
+def score(video):
+    return (
+        video['stats_number_of_comments'] * 1000 +
+        video['stats_number_of_likes'] * 100 +
+        video['stats_number_of_plays'] // 10
+    )
+
+
+def id_collector(channels, page_count):
+    r = redis.StrictRedis()
+    while True:
+        for channel in channels:
+            # set_name = 'vimeo:%s' % channel
+            for i in range(1, page_count + 1):
+                url = 'http://vimeo.com/api/v2/channel/%s/videos.json?page=%d' % (channel, i)
+                print 'Reading url: ', url
+                videos = requests.get(url, headers=headers).json
+                # print videos
+                for video in videos:
+                    video_id = video['id']
+                    if not r.sismember(fetched_key, video_id) and r.zscore(queue_key, video_id) is None:
+                        r.zadd(queue_key, score(video), video_id)
+                        print 'Adding id', video['id']
+
+        time.sleep(120)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Vimeo channel downloader.')
+    parser.add_argument('-c', '--channels', nargs='+', help='e.g., staffpicks hd everythinganimated')
+    parser.add_argument('-p', '--page-count', type=int, default=3)
+    parser.add_argument('-d', '--destination', default='~/Movies/vimeo')
+    opts = parser.parse_args()
+
+    destination = os.path.expanduser(opts.destination)
+    if not os.path.exists(destination):
+        os.makedirs(destination)
+
+    child_pid = os.fork()
+    if child_pid == 0:
+        downloader(destination)
+    else:
+        id_collector(opts.channels, opts.page_count)

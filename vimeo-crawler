@@ -71,13 +71,17 @@ def id_collector(channels, page_count):
             for i in range(1, page_count + 1):
                 url = 'http://vimeo.com/api/v2/channel/%s/videos.json?page=%d' % (channel, i)
                 print 'Reading url: ', url
-                videos = requests.get(url, headers=headers).json
+                videos = requests.get(url, headers=headers).json or []
                 # print videos
                 for video in videos:
                     video_id = video['id']
-                    if not r.sismember(fetched_key, video_id) and r.zscore(queue_key, video_id) is None:
+                    # ignore it if we've already downloaded it
+                    if not r.sismember(fetched_key, video_id):
+                        # update the score if we haven't downloaded it yet
                         r.zadd(queue_key, score(video), video_id)
-                        print 'Adding id', video['id']
+                        if r.zscore(queue_key, video_id) is None:
+                            # only note the addition if it's totally new
+                            print 'Adding id %d (%s)' % (video['id'], video['name'])
 
         time.sleep(120)
 

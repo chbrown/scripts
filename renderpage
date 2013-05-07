@@ -1,11 +1,13 @@
 #!/usr/bin/env phantomjs
-var system = require('system'),
-  webpage = require('webpage'),
-  page = webpage.create(),
-  fs = require('fs'),
-  url = system.args[1],
-  filename = url.replace(/^https?/, '').replace(/\//g, '-').replace(/\W/g, '') + '.png';
+var system = require('system');
+var webpage = require('webpage');
+var fs = require('fs');
 
+var url = system.args[1];
+
+var filename = url.replace(/^https?/, '').replace(/\//g, '-').replace(/\W/g, '') + '.png';
+
+var page = webpage.create();
 page.viewportSize = { width: 800, height: 800 };
 
 console.log('Opening url: ' + url);

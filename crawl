@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+wget -e robots=off --recursive --no-clobber --page-requisites --convert-links --restrict-file-names=windows $1

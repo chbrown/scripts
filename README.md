@@ -1,6 +1,6 @@
-# Some scripts I like, most of which I've written all by myself!
+# Some scripts I like, many of which I've written all by myself!
 
-Except for `htpasswd.py`, `soundcloud`, and `transpose` all of these scripts were written by me and are Copyright 2012-2013 Christopher Brown, released here under the MIT License.
+Except for `htpasswd.py`, `otf2ttf2eot.sh`, and `transpose` all of these scripts were written by me and are Copyright 2012-2013 Christopher Brown, released here under the MIT License.
 
 ## Prereqs:
 
@@ -17,6 +17,12 @@ Create 10 alphadecimal passwords of length 16 each.
 Measured from the top left of the screen, left-click once.
 
     click -x 600 -y 400
+
+# crawl
+
+A shortcut to this `wget` sequence:
+
+    wget -e robots=off --recursive --no-clobber --page-requisites --convert-links --restrict-file-names=windows $1
 
 # csv2html
 

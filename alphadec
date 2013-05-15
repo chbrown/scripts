@@ -9,5 +9,14 @@ args = parser.parse_args()
 
 ALPHADEC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 
+
+def sample(population, k, replacement=False):
+    if args.length > len(ALPHADEC):
+        replacement = True
+    if replacement is False:
+        return random.sample(population, k)
+    else:
+        return sum((random.sample(population, 1) for _ in range(k)), [])
+
 for i in range(args.count):
-    print ''.join(random.sample(ALPHADEC, args.length))
+    print ''.join(sample(ALPHADEC, args.length))

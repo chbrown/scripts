@@ -118,6 +118,12 @@ Like `col`, but auto-adjusts with more text. Slower, obviously.
 
     cat ANEW2010All.txt | pcol -s \\t
 
+# pdfcount
+
+Just pipes `pdftotext` (comes with LaTeX, I think) through `wc -w`:
+
+    pdfcount LSA.pdf
+
 # pdfcropall
 
 Given a list of PDFs, run `pdfcrop` on all of them with meager (but non-zero) margins, letting `pdfcrop` rename them as it likes.

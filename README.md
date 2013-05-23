@@ -12,6 +12,15 @@ Create 10 alphadecimal passwords of length 16 each.
 
     alphadec --length 16 --count 10
 
+
+# autoreload
+
+Watch a directory for changed files and restart a process when a change is detected.
+
+    autoreload python main.py
+
+From [stevekrenzel/autoreload](https://github.com/stevekrenzel/autoreload) (no license).
+
 # click
 
 Measured from the top left of the screen, left-click once.
@@ -215,6 +224,14 @@ Basic duration timer.
     > Press \n to end.
     ↪
     > 1.3509s
+
+# git-submodule-rm
+
+Until git 1.8.3 rolls around:
+
+    git-submodule-rm static/lib
+
+Thanks goes to [stackoverflow](http://stackoverflow.com/questions/1260748/how-do-i-remove-a-git-submodule).
 
 # textext
 

@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+git config --file .gitmodules --remove-section "submodule.$1"
+git add .gitmodules
+
+git config --file .git/config --remove-section "submodule.$1"
+git rm --cached "$1"
+
+echo Removed submodule, "$1"

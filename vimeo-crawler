@@ -3,6 +3,7 @@ import os
 import redis
 import argparse
 import time
+import signal
 import requests
 # from requests.exceptions import RequestException  # HTTPError, ConnectionError,
 
@@ -43,13 +44,15 @@ def downloader(destination):
             cmd = 'youtube-dl -o "%s" --restrict-filenames http://vimeo.com/%s' % (output_path, video_id)
             print cmd
             exit_code = os.system(cmd)
-            if exit_code == 0:
-                # remove from queue
-                r.zrem(queue_key, video_id)
-                # add to fetched
-                r.sadd(fetched_key, video_id)
-            else:
-                raise Exception('youtube-dl exited with error code != 0')
+
+            # remove from queue
+            r.zrem(queue_key, video_id)
+            # add to fetched
+            r.sadd(fetched_key, video_id)
+
+            if exit_code != 0:
+                print 'youtube-dl exited with error code != 0'
+                time.sleep(4)
         else:
             # no videos queued
             time.sleep(1)
@@ -71,7 +74,7 @@ def id_collector(channels, page_count):
             for i in range(1, page_count + 1):
                 url = 'http://vimeo.com/api/v2/channel/%s/videos.json?page=%d' % (channel, i)
                 print 'Reading url: ', url
-                videos = requests.get(url, headers=headers).json or []
+                videos = requests.get(url, headers=headers).json() or []
                 # print videos
                 for video in videos:
                     video_id = video['id']
@@ -98,7 +101,12 @@ if __name__ == '__main__':
         os.makedirs(destination)
 
     child_pid = os.fork()
-    if child_pid == 0:
-        downloader(destination)
-    else:
-        id_collector(opts.channels, opts.page_count)
+    try:
+        if child_pid == 0:  # current thread of execution is the child
+            downloader(destination)
+        else:  # current thread is the parent
+            id_collector(opts.channels, opts.page_count)
+    except KeyboardInterrupt:
+        print 'Caught KeyboardInterrupt, killing fork and exiting'
+        # Surely the parent will be the one catching this, and child_pid won't be 0
+        os.kill(child_pid, signal.SIGINT)

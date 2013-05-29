@@ -237,6 +237,19 @@ Thanks goes to [stackoverflow](http://stackoverflow.com/questions/1260748/how-do
 
 Uh, what? So it looks through lines of json and prints just the "text" attribute. I guess if you want to look as just Tweet text. Something like `npm install json` and then `cat feed.json | json -C text` would do the same thing.
 
+# tgz
+
+Wrapper around `tar cz`, basically:
+
+    tar -czf $1.tgz $1
+    mv $1 $1.tmp
+
+But with some existing / missing checks.
+
+Use like:
+
+    tgz penn-treebank-rel3/
+
 # transpose
 
 Super-complicated Awk script for transposing like in Excel.

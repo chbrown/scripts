@@ -3,6 +3,7 @@ import os
 import argparse
 from glob import glob
 
+
 def flatten_glob_list(fileglobs):
     for fileglob in fileglobs:
         for filepath in glob(fileglob):

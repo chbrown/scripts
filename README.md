@@ -333,6 +333,14 @@ Using `pyPdf`, open up a PDF, cropping the left and right sides right down the m
 
 A quick `pip install pyPdf` may be required.
 
+# wgetar
+
+`wget | tar -xz` helper. Get from url and unpackage based on extension (handles `gz` and `bz2`).
+
+    wgetar http://ftp.gnu.org/gnu/wget/wget-1.5.3.tar.gz
+
+
+
 # whois-domain-yaml
 
 Using a Yaml file formatted something like this:

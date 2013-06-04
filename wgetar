@@ -1,0 +1,24 @@
+#!/usr/bin/env sh
+URL=$1
+# -n $2 is true if $2 is non-null, -z $2 is true if $2 is null
+if [ -n "$2" ]; then
+  FILE=$2
+else
+  FILE=$(basename "$1")
+fi
+
+EXT=${FILE##*.} # delete longest match of /.+\./ from beginning of substring (leaving last extension)
+TAR=${FILENAME%.$EXTENSION} # delete (shortest) match of $EXTENSION from back of FILENAME
+FOLDER=${TAR%.tar}
+
+if [ $EXT = "gz" ]; then
+  FLAG='z'
+elif [ $EXT = "bz2" ]; then
+  FLAG='j'
+elif [ $EXT = "xz" ]; then
+  FLAG='x'
+fi
+
+wget $URL -O $FILE
+tar -C $FOLDER -x -$FLAG -f $FILENAME
+rm $FILENAME

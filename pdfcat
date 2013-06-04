@@ -1,0 +1,44 @@
+#!/usr/bin/env python
+import os
+import sys
+from glob import glob
+from subprocess import Popen, PIPE
+
+if __name__ == '__main__':
+    # chop off the script name
+    argv = sys.argv[1:]
+    # support either
+    # pdfcat [to_cat_1.pdf to_cat_2.pdf] | ...
+    # pdfcat [to_cat_1.pdf to_cat_2.pdf] catted.pdf
+    if not sys.stdout.isatty():
+        # make streaming just as explicit
+        argv.append('-')
+
+    if not len(argv):
+        print >> sys.stderr, 'You must specify at least one pdf!'
+        exit(1)
+
+    pdfs = argv[:-1]
+    out = argv[-1]
+
+    if not len(pdfs):
+        pdfs = glob('*.pdf')
+
+    print >> sys.stderr, 'Concatenating %d PDFs.' % len(pdfs)
+
+    # first, clean the pdfs, just in case-- just to be failsafe
+    clean_pdfs = [pdf.replace('.pdf', '.clean.pdf') for pdf in pdfs]
+    for pdf, clean_pdf in zip(pdfs, clean_pdfs):
+        if os.path.exists(pdf):
+            # print >> sys.stderr, 'gs %s > %s' % (pdf, clean_pdf)
+            args = ['gs', '-q', '-dNOPAUSE', '-dBATCH', '-sDEVICE=pdfwrite', '-sOutputFile=%s' % clean_pdf, '-f', pdf]
+            print >> sys.stderr, ' '.join(args)
+            gs_process = Popen(args)
+            gs_process.wait()
+        else:
+            print >> sys.stderr, '%s does not exist' % pdf
+
+    args = ['pdftk'] + clean_pdfs + ['cat', 'output', out]
+    print >> sys.stderr, ' '.join(args)
+    pdftk_process = Popen(args)  # stdout=PIPE, stderr=PIPE
+    pdftk_process.wait()

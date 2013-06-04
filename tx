@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+
+# see ./ptx for comments
+if [ $# -lt 1 ]
+then
+  TEXFILES=$(ls *.tex)
+else
+  TEXFILES=($1)
+fi
+TEXFILE=${TEXFILES[0]/\.tex/}
+echo "Rendering $TEXFILE"
+latex -interaction=scrollmode $TEXFILE && dvipdf $TEXFILE && open -a TeXShop.app $TEXFILE.pdf

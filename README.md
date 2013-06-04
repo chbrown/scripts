@@ -173,11 +173,23 @@ Pretty print xml, using Python's `BeautifulSoup`.
 
 Not like xml gets pretty. It just gets pretti*er*.
 
-# ptx.sh
+# ptx
 
-Run `pdflatex` on the nearest `.tex` file, without interaction, and then open in `TeXShop`.
+Run `pdflatex` on the nearest `.tex` file, potentially specified by command line argument,
+without interaction, and then open in `TeXShop`.
 
-    ptx Brown_FinalReport.pdf
+    ptx Brown_FinalReport.tex
+
+Or
+
+    ptx Brown_FinalReport
+
+Or
+  
+    $ ls *.tex
+    Brown_FinalReport.tex     Figures.tex     Zscores.tex
+
+    $ ptx
 
 I use this in Sublime Text 2 in my `LaTeX` build system.
 
@@ -260,11 +272,13 @@ Super-complicated Awk script for transposing like in Excel.
 
     transpose alice-results.dat | pcol -g 2
 
-# tx.sh
+# tx
 
-Like `ptx.sh`, but with a `latex` && `dvipdf` pipeline instead of `pdflatex`. In case you're still using `qtree` with arrows. (In which case you really ought to check out TikZ.)
+Like [`ptx`](#ptx), but with a `latex && dvipdf` pipeline instead of `pdflatex`.
+You'll probably only find this useful if you're still using `qtree` with arrows,
+in which case you really ought to check out `TikZ`.
 
-    tx.sh so_many_trees
+    tx so_many_trees
 
 # vimeo-crawler
 

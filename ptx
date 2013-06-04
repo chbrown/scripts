@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+if [ $# -lt 1 ]
+then
+  # if the number of command line args < 1, no file specified
+  TEXFILES=$(ls *.tex)
+else
+  TEXFILES=($1)
+fi
+echo "Rendering ${TEXFILES[0]}"
+pdflatex -interaction=scrollmode ${TEXFILES[0]} && open -a TeXShop.app ${TEXFILES[0]/\.tex/}.pdf

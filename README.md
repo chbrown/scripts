@@ -33,7 +33,7 @@ Beautify all source code in `./src/*.c` and `./src/*.h`, in-place.
 
 Uses [`astyle`](http://astyle.sourceforge.net/) with the following options:
 
-    astyle 
+    astyle
        --style=java
        --
        --unpad-paren
@@ -156,6 +156,16 @@ Like `col`, but auto-adjusts with more text. Slower, obviously.
 
     cat ANEW2010All.txt | pcol -s \\t
 
+# pdfcat
+
+`gs | pdftk cat output` helper.
+
+    pdfcat page1.pdf page2.pdf bothpages.pdf
+
+Or
+
+    pdfcat page1.pdf page2.pdf > bothpages.pdf
+
 # pdfcount
 
 Just pipes `pdftotext` (comes with LaTeX, I think) through `wc -w`:
@@ -214,7 +224,7 @@ Or
     ptx Brown_FinalReport
 
 Or
-  
+
     $ ls *.tex
     Brown_FinalReport.tex     Figures.tex     Zscores.tex
 

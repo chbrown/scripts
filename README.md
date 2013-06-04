@@ -72,6 +72,14 @@ One-liner for when you have some lengthy lines and you want to kill the wrap:
 
     tr '\t' ' ' | cut -c -$(tput cols)
 
+# git-submodule-rm
+
+Until git 1.8.3 rolls around:
+
+    git-submodule-rm static/lib
+
+Thanks goes to [stackoverflow](http://stackoverflow.com/questions/1260748/how-do-i-remove-a-git-submodule).
+
 # htpasswd.py
 
 Script originally from a guy named "Eli Carter."
@@ -258,13 +266,16 @@ Basic duration timer.
     ↪
     > 1.3509s
 
-# git-submodule-rm
+# ssh-copy-rsa
 
-Until git 1.8.3 rolls around:
+Just cat current user's `id_rsa.pub` into remote `.ssh` directory on the given server, creating `.ssh` and `authorized_keys2` if necessary:
 
-    git-submodule-rm static/lib
+    ssh-copy-rsa dark
 
-Thanks goes to [stackoverflow](http://stackoverflow.com/questions/1260748/how-do-i-remove-a-git-submodule).
+You may need to fix the permissions on the remote's new `~/.ssh`, i.e.:
+
+    700 .ssh
+    644 .ssh/authorized_keys2
 
 # textext
 
@@ -338,8 +349,6 @@ A quick `pip install pyPdf` may be required.
 `wget | tar -xz` helper. Get from url and unpackage based on extension (handles `gz` and `bz2`).
 
     wgetar http://ftp.gnu.org/gnu/wget/wget-1.5.3.tar.gz
-
-
 
 # whois-domain-yaml
 

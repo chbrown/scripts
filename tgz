@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+# Use like: tgz penn-treebank-rel3/
+
+# remove trailing slash (hopefully there's only one)
+file=${1%/}
+[ ! -e $file ] && echo $file does not exist. && exit 1
+
+file_tgz=$file.tgz
+[ -e $file_tgz ] && echo $file_tgz already exists, not overwriting. && exit 1
+
+echo tar -czf $file_tgz $file
+tar -czf $file_tgz $file
+mv $file $file.tmp
+echo $file_tgz created and original moved to $file.tmp

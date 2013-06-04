@@ -237,6 +237,10 @@ Thanks goes to [stackoverflow](http://stackoverflow.com/questions/1260748/how-do
 
 Uh, what? So it looks through lines of json and prints just the "text" attribute. I guess if you want to look as just Tweet text. Something like `npm install json` and then `cat feed.json | json -C text` would do the same thing.
 
+# tnls
+
+List all active ssh tunnels, looking for something like `ssh ... -L ...`.
+
 # tgz
 
 Wrapper around `tar cz`, basically:

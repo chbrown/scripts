@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+# -e ? means interpret whatever follows the -e as a regex pattern (as opposed to a flag)
+ps aux | grep -v grep | grep ssh | grep : | grep -e -L

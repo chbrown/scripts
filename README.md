@@ -66,6 +66,12 @@ Uses Python's dialects to convert.
 
     cat sb5b.csv | tr '\r' '\n' | csv2tsv > sb5b.tsv
 
+# curlweb2.0
+
+Wait until a page doesn't scroll down anymore, and then output the DOM to `STDOUT`.
+
+    curlweb2.0 http://animalstalkinginallcaps.tumblr.com/
+
 # fit
 
 One-liner for when you have some lengthy lines and you want to kill the wrap:

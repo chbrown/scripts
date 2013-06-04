@@ -8,7 +8,7 @@ else
 fi
 
 EXT=${FILE##*.} # delete longest match of /.+\./ from beginning of substring (leaving last extension)
-TAR=${FILENAME%.$EXTENSION} # delete (shortest) match of $EXTENSION from back of FILENAME
+TAR=${FILE%.$EXT} # delete (shortest) match of $EXTENSION from back of FILENAME
 FOLDER=${TAR%.tar}
 
 if [ $EXT = "gz" ]; then
@@ -20,5 +20,6 @@ elif [ $EXT = "xz" ]; then
 fi
 
 wget $URL -O $FILE
-tar -C $FOLDER -x -$FLAG -f $FILENAME
-rm $FILENAME
+mkdir -p $FOLDER
+tar -C $FOLDER -x -$FLAG -f $FILE
+rm $FILE

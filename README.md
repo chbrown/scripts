@@ -27,6 +27,27 @@ Measured from the top left of the screen, left-click once.
 
     click -x 600 -y 400
 
+# cfmt
+
+Beautify all source code in `./src/*.c` and `./src/*.h`, in-place.
+
+Uses [`astyle`](http://astyle.sourceforge.net/) with the following options:
+
+    astyle 
+       --style=java
+       --
+       --unpad-paren
+       --delete-empty-lines
+       --add-brackets
+       --convert-tabs
+       --align-pointer=type
+       --lineend=linux
+       --suffix=none $file
+
+Get `astyle` from your package manager, e.g.:
+
+    brew install astyle
+
 # crawl
 
 A shortcut to this `wget` sequence:

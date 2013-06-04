@@ -1,6 +1,5 @@
 #!/usr/bin/env sh
-if [ $# -lt 1 ]
-then
+if [ $# -lt 1 ]; then
   # if the number of command line args < 1, no file specified
   TEXFILES=$(ls *.tex)
 else

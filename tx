@@ -1,8 +1,6 @@
 #!/usr/bin/env sh
-
 # see ./ptx for comments
-if [ $# -lt 1 ]
-then
+if [ $# -lt 1 ]; then
   TEXFILES=$(ls *.tex)
 else
   TEXFILES=($1)

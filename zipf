@@ -1,0 +1,33 @@
+#!/usr/bin/env python
+import sys
+import argparse
+import re
+from collections import Counter
+
+parser = argparse.ArgumentParser(description='Token / type comparator')
+parser.add_argument('-c', '--case-sensitive', action='store_true', help='retain case')
+parser.add_argument('-t', '--top', default=200, type=int, help='output lines')
+parser.add_argument('-r', '--regex', default=r'\w+', help='token match')
+args = parser.parse_args()
+
+# e.g., use `zipf -r '\S'` to tokenize by character.
+
+wc = 0
+types = Counter()
+# line breaks don't matter, but they are a convenient way to iterate
+for byte_line in sys.stdin:
+    utf8_line = byte_line.decode('utf8')
+    line = utf8_line if args.case_sensitive else utf8_line.lower()
+
+    tokens = re.findall(args.regex, line, re.UNICODE)
+
+    wc += len(tokens)
+    types.update(tokens)
+
+print u'%26s %7s %9s' % ('token', 'count', 'freq')
+for token, count in types.most_common(args.top):
+    # if token.iswhitespace():
+    # else:
+    # repr()[2:-1]
+    term = token
+    print u'%26s %7d %8.4f%%' % (term, count, count * 100.0 / wc)

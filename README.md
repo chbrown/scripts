@@ -78,6 +78,14 @@ One-liner for when you have some lengthy lines and you want to kill the wrap:
 
     tr '\t' ' ' | cut -c -$(tput cols)
 
+# git-remote-tags
+
+Wrapping around `git ls-remote --tags git://...` to get the good stuff:
+
+    git-remote-tags chbrown/amulet
+
+Assumes github.
+
 # git-submodule-rm
 
 Until git 1.8.3 rolls around:
@@ -387,9 +395,9 @@ Using Python's yaml and json modules, read in yaml and output json. Useful becau
 
     cat simple_spec.yaml | yaml2json > simple_spec.json
 
-# zipf.py
+# zipf
 
 Print out the most common words in a plain text document.
 
     cd ~/corpora/heliohost
-    zipf.py Fre_Newspapers.txt
+    <Fre_Newspapers.txt zipf

@@ -1,44 +1,58 @@
 #!/usr/bin/env python
+import sys
+import fileinput
 import subprocess
 import re
 from datetime import datetime
-import argparse
 import redis
-import yaml
+
+# Get expiration dates for a list of domains
 
 client = redis.StrictRedis()
 
-searches = {
-    'updated': re.compile('Updat\w+ Date:\s*(\d+-\w+-\d+)', re.I),
-    'created': re.compile('Creat\w+ Date:\s*(\d+-\w+-\d+)', re.I),
-    'expires': re.compile('Expir\w+ Date:\s*(\d+-\w+-\d+)', re.I)
-}
 
-def whois(domain_name):
-    key = 'domains:%s' % domain_name
-    cached = client.get(key)
-    if not cached:
-        print 'Querying whois for %s' % domain_name
-        cached = subprocess.check_output(['whois', domain_name])
-        client.set(key, cached)
-        # cache for 1h only
-        client.expire(key, 60*60)
-    return cached
+def call_whois(domain_name):
+    print >> sys.stderr, '$ whois ' + domain_name
+    return subprocess.check_output(['whois', domain_name])
 
-def extract_date(whois_text, regex):
-    match = regex.search(whois_text)
-    # if not match: print 'Could not find %s for domain %s' % (attr, name)
-    value = match.group(1)
-    return datetime.strptime(value, '%d-%b-%Y')
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Get expiration dates for a yaml file of domains.')
-    parser.add_argument('file', default='/Users/chbrown/domains.yaml')
-    args = parser.parse_args()
+class Domain(object):
+    def __init__(self, name):
+        self.name = name
 
-    sections = yaml.load(open(args.file))
-    domain_names = sum(sections.values(), [])
-    expirations = [extract_date(whois(domain_name), searches['expires']) for domain_name in domain_names]
+    @property
+    def whois(self):
+        key = 'whois:%s' % self.name
+        cached = client.get(key)
+        if not cached or 'WHOIS LIMIT EXCEEDED' in cached:
+            cached = call_whois(self.name)
+            client.set(key, cached)
+            client.expire(key, 60*60)  # cache for 1h
+        return cached
 
-    for expiration, domain_name in sorted(zip(expirations, domain_names)):
-        print '%s\t%s' % (expiration.strftime('%Y-%m-%d'), domain_name)
+    # searches = {'updated': re.compile('Updat\w+ Date:\s*(\d+-\w+-\d+)', re.I),
+    #             'created': re.compile('Creat\w+ Date:\s*(\d+-\w+-\d+)', re.I), }
+
+    @property
+    def expires(self):
+        # Look for day-monthname-year, first:
+        #   Expiration Date: 04-jul-2014
+        match = re.search(r'Expir\w+ Date:\s*(\d{1,2}-[a-z]{3,10}-\d{4})', self.whois, re.I)
+        if match:
+            return datetime.strptime(match.group(1), '%d-%b-%Y')
+        # Fall back to:
+        #   Expiration Date:2014-04-20T23:59:59.0Z (ISO 8601 + TZ)
+        #   Only .pw uses this format.
+        match = re.search(r'Expir\w+ Date:\s*(\d{4}-\d{2}-\d{2})', self.whois, re.I)
+        if match:
+            return datetime.strptime(match.group(1), '%Y-%m-%d')
+
+        raise Exception('Could not find expiration date for %s: %s' % (self.name, self.whois))
+
+
+text = ''.join(fileinput.input())
+domains = [Domain(name) for name in re.findall('[-_A-Za-z.]+\.[\w+]+', text)]
+print >> sys.stderr, '%d domains' % len(domains)
+
+for domain in sorted(domains, key=lambda domain: domain.expires):
+    print '{expires}\t{name}'.format(name=domain.name, expires=domain.expires.strftime('%Y-%m-%d'))

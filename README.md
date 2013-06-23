@@ -226,6 +226,12 @@ Pretty print xml, using Python's `BeautifulSoup`.
 
 Not like xml gets pretty. It just gets pretti*er*.
 
+# prependbom
+
+Prepend the UTF-8 byte order marker (BOM) to the input. Uses `fileinput`, so STDIN and all files supplied as command line arguments will be streamed to STDOUT after the BOM byte sequence, `\xef\xbb\xbf`.
+
+    <flat.txt prependbom > flat.utf8
+
 # ptx
 
 Run `pdflatex` on the nearest `.tex` file, potentially specified by command line argument,
@@ -374,20 +380,14 @@ A quick `pip install pyPdf` may be required.
 
     wgetar http://ftp.gnu.org/gnu/wget/wget-1.5.3.tar.gz
 
-# whois-domain-yaml
+# whois-domains
 
-Using a Yaml file formatted something like this:
+1. Extract all strings that look something like domain names from the supplied files (uses Python's `fileinput`)
+2. Fetch all the whois records using the command line `whois`
+3. Cache raw whois results in Redis (using the bucket prefix `whois:`) because `whois` servers are finicky. If some whois request times out or the program crashes, simply restart the script and it will resume where it left off.
+4. Extract the expiration date from the whois records and list them all, ordered from soonest expiration to most distant.
 
-    ---
-    sites:
-      - henrian.com
-      - mehenry.com
-    personal:
-      - cal0.com
-
-etc., get all the whois records using the command line `whois`, cache them in Redis in case it times out, and return them all, ordered from next expiration to most distant expiration.
-
-    whois-domain-yaml that.yaml
+    whois-domains ~/domains.yaml
 
 # yaml2json
 

@@ -1,4 +1,4 @@
-#!/opt/python2.7.2/bin/python
+#!/usr/bin/env python
 import sys
 import json
 counter = 0
@@ -10,7 +10,7 @@ while 1:
             raise EOFError
         print '-----------------------------------| %d |---------------------------------' % (counter, )
         print json.dumps(json.loads(line), sort_keys=True, indent=2)
-    except ValueError: 
+    except ValueError:
         print 'broken'
         print line
     except KeyboardInterrupt:

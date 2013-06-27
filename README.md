@@ -158,6 +158,14 @@ Copy the MongoDB somewhere to somewhere else.
 
     mongomigrate.rb asl:drags localhost:drags
 
+# mysqlshove
+
+MySQL helper for creating a table directly from a csv file.
+
+    mysqlshove somedb maps/coords.csv --table some_new_table -u root
+
+The first column of the table should be unique integers, and it will be named `pkid`.
+
 # otf2ttf2eot.sh
 
 Convert an OTF font file to EOT with fontforge

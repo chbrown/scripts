@@ -1,0 +1,43 @@
+#!/usr/bin/env python
+import argparse
+import re
+from subprocess import Popen, PIPE
+from colorama import Fore, Back, Style
+
+parser = argparse.ArgumentParser(
+    description='Print statuses for a list of git repositories',
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument('files', nargs='+', help='Git repositories')
+parser.add_argument('-v', '--verbose', action='store_true', help='Log more')
+opts = parser.parse_args()
+
+
+committed_re = re.compile(r'^## [-a-z]+\s*$')
+
+for filename in opts.files:
+    git_process = Popen(['git', 'status', '-sb'], stdout=PIPE, stderr=PIPE, cwd=filename)
+    stdoutdata, stderrdata = git_process.communicate()
+    if git_process.returncode == 0 and committed_re.match(stdoutdata):
+        if opts.verbose:
+            print '({filename} is clean and committed)'.format(filename=filename)
+    else:
+        print '\x1b[7m' + filename + '\x1b[0m'
+        # print '$?', git_process.returncode
+        if stdoutdata:
+            branch, changes = stdoutdata.split('\n', 1)
+            if not committed_re.match(branch):
+                print Fore.MAGENTA + branch + Fore.RESET
+            for change in changes.split('\n'):
+                if change.startswith(' M'):
+                    print Fore.BLUE + change + Fore.RESET
+                elif change.startswith(' A'):
+                    print Fore.GREEN + change + Fore.RESET
+                elif change.startswith(' D'):
+                    print Fore.RED + change + Fore.RESET
+                elif change.startswith('??'):
+                    print Fore.YELLOW + change + Fore.RESET
+                else:
+                    print change
+        if stderrdata:
+            # if opts.verbose:
+            print stderrdata

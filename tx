@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 # see ./ptx for comments
 if [ $# -lt 1 ]; then
   TEXFILES=$(ls *.tex)

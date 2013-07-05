@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 # Use like: tgz penn-treebank-rel3/
 
 # remove trailing slash (hopefully there's only one)

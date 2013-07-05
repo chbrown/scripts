@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 URL=$1
 # -n $2 is true if $2 is non-null, -z $2 is true if $2 is null
 if [ -n "$2" ]; then

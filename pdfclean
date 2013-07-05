@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 # sed version:
 LANG=C
 pdftk - output - uncompress | sed -e '/^.UTXA/d' | pdftk - output - compress

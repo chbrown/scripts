@@ -3,7 +3,7 @@
 from subprocess import Popen
 import redis
 
-# cmd = "sudo /etc/init.d/mediatomb restart"
+# cmd = "sudo /etc/init.d/xyz restart"
 
 # rsa_key = paramiko.RSAKey.from_private_key_file('/Users/chbrown/.ssh/id_rsa')
 # ssh = paramiko.SSHClient()

@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 RTEXFILES=($1)
 RTEXFILE=${RTEXFILES[0]/\.Rtex/}
 echo Knitting $RTEXFILE

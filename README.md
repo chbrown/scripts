@@ -96,6 +96,13 @@ Wait until a page doesn't scroll down anymore, and then output the DOM to `STDOU
 
     curlweb2.0 http://animalstalkinginallcaps.tumblr.com/
 
+# gh
+
+Open any [GitHub](https://github.com/) pages which the current git repo has as remotes.
+
+    cd ~/scripts
+    gh # opens https://github.com/chbrown/scripts in your browser
+
 # fit
 
 One-liner for when you have some lengthy lines and you want to kill the wrap:

@@ -1,10 +1,34 @@
-# Some scripts I like, many of which I've written all by myself!
+# scripts
 
-Except for `htpasswd.py`, `otf2ttf2eot.sh`, and `transpose` all of these scripts were written by me and are Copyright 2012-2013 Christopher Brown, released here under the MIT License.
+Some handy short scripts I like, many of which I've written all by myself!
 
-## Prereqs:
+## Installation
 
-    pip install requests
+```bash
+cd ~
+git clone git://github.com/chbrown/scripts.git
+echo 'export PATH=$HOME/scripts:$PATH >> .bashrc.local
+```
+
+Prerequisite for many of these scripts:
+
+```bash
+pip install requests colorama
+```
+
+## License
+
+Copyright © 2012–2013 Christopher Brown. [MIT Licensed](LICENSE).
+
+Except for following files, I am the sole author of all of these scripts.
+
+* autoreload
+* htpasswd.py
+* otf2ttf2eot.sh
+* soundcloud
+* transpose
+
+---
 
 # alphadec
 
@@ -400,7 +424,9 @@ A quick `pip install pyPdf` may be required.
 3. Cache raw whois results in Redis (using the bucket prefix `whois:`) because `whois` servers are finicky. If some whois request times out or the program crashes, simply restart the script and it will resume where it left off.
 4. Extract the expiration date from the whois records and list them all, ordered from soonest expiration to most distant.
 
-    whois-domains ~/domains.yaml
+```bash
+whois-domains ~/domains.yaml
+```
 
 # yaml2json
 

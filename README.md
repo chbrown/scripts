@@ -197,6 +197,30 @@ MySQL helper for creating a table directly from a csv file.
 
 The first column of the table should be unique integers, and it will be named `pkid`.
 
+# now
+
+Print out the current datetime in some variation on ISO-8601:
+
+|output|timezone|date|time|file|eol|
+|:-----|:-------|:---|:---|:---|:--|
+|`2013-07-08`|UTC|True|False|False|False|
+|`18:16:52`|UTC|False|True|False|False|
+|`2013-07-08T18:16:52`|UTC|False|False|False|False|
+|`2013-07-08T18:16:52\n`|UTC|False|False|False|True|
+|`2013-07-08T18-16-52`|UTC|False|False|True|False|
+|`2013-07-08`|None|True|False|False|False|
+|`13:16:52`|None|False|True|False|False|
+|`2013-07-08T13:16:52`|None|False|False|False|False|
+|`2013-07-08T13:16:52\n`|None|False|False|False|True|
+|`2013-07-08T13-16-52`|None|False|False|True|False|
+
+
+```bash
+$ now --utc -l
+2013-07-08T18:18:51
+$
+```
+
 # otf2ttf2eot.sh
 
 Convert an OTF font file to EOT with fontforge

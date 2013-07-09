@@ -1,0 +1,155 @@
+#!/usr/bin/env python
+import re
+import os
+import argparse
+from colorama import Fore  # , Back, Style
+import ConfigParser
+import boto
+import hashlib
+import logging
+logging.basicConfig(level=logging.INFO)
+
+
+# tree data structure definition (abstract, not intended to be instantiated directly)
+class Node(object):
+    has_children = False
+    has_checksum = False
+    root = None
+    key = None
+    '''
+    Nodes each have a key (empty / None for the root).
+        In addition to the key:
+            * They either have children (which must be Nodes)
+            * Or a checksum
+    '''
+    def __eq__(left, right):
+        '''Returns True if self and other are equal.'''
+        assert isinstance(right, Node), 'Other must also be a Node'
+        logging.info('%r vs. %r', left, right)
+        assert left.key == right.key, 'Should not compare Nodes with different keys'
+
+        tests = []
+
+        if left.has_checksum and right.has_checksum:
+            tests += [left.checksum == right.checksum]
+            fore_color = Fore.GREEN
+            logging.warn('%s[checksums] left = %s, right = %s%s',
+                fore_color, left.checksum, right.checksum, Fore.RESET)
+
+        if left.has_children and right.has_children:
+            left_children = dict((child.key, child) for child in left.children)
+            right_children = dict((child.key, child) for child in right.children)
+
+            left_keys = set(left_children.keys())
+            right_keys = set(right_children.keys())
+
+            left_only = left_keys - right_keys
+            right_only = right_keys - left_keys
+            tests += [len(left_only) == 0, len(right_only) == 0]
+            if len(left_only) > 0:
+                logging.error('%sleft excess keys: %s%s', Fore.RED, ' '.join(left_only), Fore.RESET)
+            if len(right_only) > 0:
+                logging.error('%sright excess keys: %s%s', Fore.RED, ' '.join(right_only), Fore.RESET)
+
+            shared_keys = left_keys & right_keys
+            tests += [left_children[key] == right_children[key] for key in shared_keys]
+
+        tests += [len(tests) > 0]
+        if len(tests) == 0:
+            logging.error('%sequality could not be determined%s', Fore.RED, Fore.RESET)
+
+        return all(tests)
+
+    def __str__(self):
+        return self.root + self.key
+
+    def __repr__(self):
+        return '<%s %s>' % (self.__class__.__name__, str(self))
+
+
+class S3Node(Node):
+    def __init__(self, bucket, entity, root=None):
+        assert isinstance(bucket, boto.s3.bucket.Bucket), 'bucket must be a boto bucket.'
+
+        self.bucket = bucket
+        self.entity = entity
+        self.has_children = entity.name.endswith('/')
+        self.has_checksum = not self.has_children
+        self.root = root or entity.name.rstrip('/')
+        self.key = entity.name[len(self.root):]
+
+    @property
+    def checksum(self):
+        # will fail for Prefix entities
+        return self.entity.etag.strip('"')
+
+    @property
+    def children(self):
+        # if isinstance(self.path, boto.s3.key.Key):
+        # if isinstance(self.path, boto.s3.prefix.Prefix):
+        for result in self.bucket.list(prefix=str(self), delimiter='/'):
+            yield S3Node(self.bucket, result, self.root)
+
+
+class FSNode(Node):
+    def __init__(self, filepath, root=None):
+        assert filepath[-1] != '/', 'filepath must not have trailing slash: %s' % filepath
+
+        self.has_children = os.path.isdir(filepath)
+        self.has_checksum = not self.has_children
+        self.root = root or filepath
+        # key will always have a trailing slash for directories
+        subpath = filepath[len(self.root):]
+        self.key = subpath + ('/' if self.has_children else '')
+
+    @property
+    def checksum(self):
+        return hashlib.md5(open(str(self), 'rb').read()).hexdigest()
+
+    @property
+    def children(self):
+        filenames = os.listdir(str(self))
+        for filename in filenames:
+            yield FSNode(os.path.join(str(self), filename), self.root)
+
+
+def resolve_uri_to_node(uri, s3_connection):
+    s3_match = re.match(r's3://([^\/]+)/(.+)$', uri, re.I)
+    logging.debug('uri regex match for %s: %s', uri, s3_match.groups() if s3_match else None)
+    if s3_match:
+        bucket_name, root = s3_match.groups()
+        bucket = s3_connection.get_bucket(bucket_name)
+        # path = bucket.get_key(root) or boto.s3.prefix.Prefix(bucket, root)
+        # coerce to Prefix
+        path = boto.s3.prefix.Prefix(bucket, root)
+        return S3Node(bucket, path)
+    else:
+        # root = uri.rstrip('/') + '/'
+        return FSNode(uri)
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Compare S3 and local filestructure')
+    parser.add_argument('left')
+    parser.add_argument('right')
+    opts = parser.parse_args()
+
+    # read config in from ~/.s3cfg (which s3cmd --configure will create)
+    config_path = os.path.expanduser('~/.s3cfg')
+    config_parser = ConfigParser.RawConfigParser()
+    config_parser.read(config_path)
+
+    keypair = config_parser.get('default', 'access_key'), config_parser.get('default', 'secret_key')
+    logging.info('Using keypair, access_key: %s, secret_key: %s', *keypair)
+
+    conn = boto.connect_s3(*keypair)
+    # global conn
+
+    left = resolve_uri_to_node(opts.left, conn)
+    right = resolve_uri_to_node(opts.right, conn)
+
+    exit(0 if left == right else 1)
+
+
+if __name__ == '__main__':
+    main()

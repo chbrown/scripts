@@ -7,7 +7,6 @@ import ConfigParser
 import boto
 import hashlib
 import logging
-logging.basicConfig(level=logging.INFO)
 
 
 # tree data structure definition (abstract, not intended to be instantiated directly)
@@ -31,10 +30,14 @@ class Node(object):
         tests = []
 
         if left.has_checksum and right.has_checksum:
-            tests += [left.checksum == right.checksum]
-            fore_color = Fore.GREEN
-            logging.warn('%s[checksums] left = %s, right = %s%s',
-                fore_color, left.checksum, right.checksum, Fore.RESET)
+            checksums_equal = left.checksum == right.checksum
+            if checksums_equal:
+                logging.info('%s[checksums] left = right = %s%s',
+                    Fore.GREEN, right.checksum, Fore.RESET)
+            else:
+                logging.warn('%s[checksums] left = %s, right = %s%s',
+                    Fore.RED, left.checksum, right.checksum, Fore.RESET)
+            tests += [checksums_equal]
 
         if left.has_children and right.has_children:
             left_children = dict((child.key, child) for child in left.children)
@@ -47,14 +50,14 @@ class Node(object):
             right_only = right_keys - left_keys
             tests += [len(left_only) == 0, len(right_only) == 0]
             if len(left_only) > 0:
-                logging.error('%sleft excess keys: %s%s', Fore.RED, ' '.join(left_only), Fore.RESET)
+                logging.warn('%sleft excess keys: %s%s', Fore.BLUE, ' '.join(left_only), Fore.RESET)
             if len(right_only) > 0:
-                logging.error('%sright excess keys: %s%s', Fore.RED, ' '.join(right_only), Fore.RESET)
+                logging.warn('%sright excess keys: %s%s', Fore.BLUE, ' '.join(right_only), Fore.RESET)
 
             shared_keys = left_keys & right_keys
-            tests += [left_children[key] == right_children[key] for key in shared_keys]
+            child_tests = [left_children[key] == right_children[key] for key in shared_keys]
+            tests += child_tests
 
-        tests += [len(tests) > 0]
         if len(tests) == 0:
             logging.error('%sequality could not be determined%s', Fore.RED, Fore.RESET)
 
@@ -87,8 +90,10 @@ class S3Node(Node):
     def children(self):
         # if isinstance(self.path, boto.s3.key.Key):
         # if isinstance(self.path, boto.s3.prefix.Prefix):
-        for result in self.bucket.list(prefix=str(self), delimiter='/'):
-            yield S3Node(self.bucket, result, self.root)
+        prefix = str(self)
+        for result in self.bucket.list(prefix=prefix, delimiter='/'):
+            if result.name != prefix:
+                yield S3Node(self.bucket, result, self.root)
 
 
 class FSNode(Node):
@@ -129,10 +134,14 @@ def resolve_uri_to_node(uri, s3_connection):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Compare S3 and local filestructure')
+    parser = argparse.ArgumentParser(description='Compare S3 and local files')
     parser.add_argument('left')
     parser.add_argument('right')
+    parser.add_argument('--verbose', action='store_true', help='Print successes, too.')
     opts = parser.parse_args()
+
+    level = logging.INFO if opts.verbose else logging.WARN
+    logging.basicConfig(level=level)
 
     # read config in from ~/.s3cfg (which s3cmd --configure will create)
     config_path = os.path.expanduser('~/.s3cfg')

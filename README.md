@@ -7,7 +7,7 @@ Some handy short scripts I like, many of which I've written all by myself!
 ```bash
 cd ~
 git clone git://github.com/chbrown/scripts.git
-echo 'export PATH=$HOME/scripts:$PATH >> .bashrc.local
+echo 'export PATH=$HOME/scripts:$PATH' >> .bashrc.local
 ```
 
 Prerequisite for many of these scripts:
@@ -22,11 +22,12 @@ Copyright © 2012–2013 Christopher Brown. [MIT Licensed](LICENSE).
 
 Except for following files, I am the sole author of all of these scripts.
 
-* autoreload
-* htpasswd.py
-* otf2ttf2eot.sh
-* soundcloud
-* transpose
+* `autoreload`
+* `htpasswd.py`
+* `otf2ttf2eot.sh`
+* `soundcloud`
+* `transpose`
+* `lib/` and everything in this directory.
 
 ---
 

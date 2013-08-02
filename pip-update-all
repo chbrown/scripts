@@ -1,8 +1,0 @@
-#!/usr/bin/env python
-import pip
-for dist in pip.get_installed_distributions():
-    if 'site-packages' in dist.location:
-        try:
-            pip.call_subprocess(['pip', 'install', '-U', dist.key])
-        except Exception, exc:
-            print exc

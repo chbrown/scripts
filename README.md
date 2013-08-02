@@ -270,11 +270,21 @@ Like mongomigrate, but shorter (and not ruby)!
 
 Uses `ssh -C` and `pg_dump` but that's about it. You'll need to `dropdb` and `createdb`, etc., yourself.
 
-# pip-update-all
+# pip-more
 
-Simply do a `pip install -U <package>` on all your installed packages.
+Mostly foreach-type calls for Python packages, mainly using `pip`.
 
-    pip-update-all
+* Simply do a `pip install -U <package>` on all your installed packages:
+
+        pip-more update
+
+* Print out Python's `sys.path`:
+
+        pip-more paths
+
+* Uninstall (some) Python packages that are linked with their own `.pth` files:
+
+        pip-more clean
 
 # ppjson
 

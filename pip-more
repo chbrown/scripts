@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+import re
+import pip
+import sys
+
+
+whitelist = ['setuptools', 'pip']
+
+
+def pip_call(*args):
+    try:
+        pip.util.call_subprocess(['pip'] + list(args))
+    except Exception, exc:
+        print exc
+
+
+def paths(**kw):
+    for path in sys.path:
+        print path
+
+
+def update(**kw):
+    for dist in pip.get_installed_distributions():
+        if 'site-packages' in dist.location:
+            pip_call('install', '-U', dist.key)
+        else:
+            print 'Not updating', dist
+
+
+def clean(**kw):
+    for path in sys.path:
+        match = re.search(r'/Library/Python/2.7/site-packages/(\w+)-.+', path)
+        if match:
+            name = match.group(1)
+            if name not in whitelist:
+                pip_call('uninstall', '-y', name)
+
+
+commands = dict(paths=paths, update=update, clean=clean)
+
+
+def main():
+    import argparse
+    parser = argparse.ArgumentParser(description='Tools for working with python packaging')
+    parser.add_argument('command', choices=commands, help='Command to run')
+
+    opts = parser.parse_args()
+
+    commands[opts.command](**vars(opts))
+
+if __name__ == '__main__':
+    main()

@@ -1,16 +1,15 @@
 #!/usr/bin/env python
+import os
 import sys
 from datetime import datetime
-import os
-
-write = sys.stdout.write
 
 for filepath in sys.argv[1:]:
     created = datetime.fromtimestamp(os.path.getmtime(filepath))
+    content = open(filepath).read().decode('utf16')
 
-    header = '[%s] %s' % (created.isoformat(' '), filepath)
-
-    write(header)
-    write('\n')
-    write(open(filepath).read().decode('utf16'))
-    write('\n\n')
+    section = u'[{created}] {filepath}\n{content}\n\n'.format(
+        created=created.isoformat(' '),
+        filepath=filepath,
+        content=content,
+    )
+    sys.stdout.write(section.encode('utf8'))

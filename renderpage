@@ -35,7 +35,8 @@ page.viewportSize = {width: opts.width, height: opts.height};
 console.log('Opening url: ' + url);
 page.open(url, function(status) {
   if (status != 'success') {
-    throw new Error('Failed: ' + status);
+    console.error('Page open status is "' + status + '", not "success"');
+    phantom.exit(1);
   }
   else {
     if (opts.autofit) {

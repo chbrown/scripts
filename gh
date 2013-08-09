@@ -2,7 +2,7 @@
 
 # types of github links:
 # 1. git@github.com:chbrown/scripts.git      (ssh)
-# 2. git://github.com/chbrown/scripts.git  (https)
+# 2. git://github.com/chbrown/scripts.git    (git)
 # 3. https://github.com/chbrown/scripts.git  (https)
 
 open(GIT, "git remote --verbose |") || die "Failed: $!\n";

@@ -1,0 +1,93 @@
+#!/usr/bin/env python
+import os
+import argparse
+import sys
+import json
+import requests
+
+root = 'https://api.github.com'
+
+
+class Printer():
+    def __init__(self):
+        interactive = sys.stdout.isatty()
+        self.encoder = json.JSONEncoder(
+            ensure_ascii=False,
+            sort_keys=True,
+            indent=2 if interactive else None,
+            separators=(', ', ': ') if interactive else (',', ':'),
+            default=self.default)
+
+    def __call__(self, obj):
+        return self.encoder.encode(obj)
+
+    def default(obj):
+        if isinstance(obj, requests.models.CaseInsensitiveDict):
+            return dict(obj.items())
+        return obj
+
+printer = Printer()
+
+
+def request(path, method='GET', headers=None, **params):
+    url = root + path
+    response = requests.request(method, url, headers=headers, params=params)
+    result = response.json()
+    if isinstance(result, dict):
+        print printer(result)
+    else:
+        for entry in result:
+            print printer(entry)
+
+# def hashes():
+#     import glob
+#     import hashlib
+#     for file_path in glob.glob('data/*'):
+#         file_size = os.path.getsize(file_path)
+#         with open(file_path) as fp:
+#             file_data = fp.read()
+
+#         url = '/repos/{owner}/{repo}/contents/{path}'.format(path=file_path, **repo)
+#         params = dict(ref=repo['branch'])
+#         response = requests.get(root + url, headers=headers, params=params)
+#         result = response.json()
+#         print 'Getting file contents... status:', response.status_code
+
+#         shahash = hashlib.sha1('blob %d\0' % file_size)
+#         shahash.update(file_data)
+#         local_sha = shahash.hexdigest()
+#         remote_sha = result.get('sha')
+#         print file_path, local_sha, remote_sha
+
+
+# def listfiles():
+#     # import pprint
+#     url = '/repos/{owner}/{repo}/contents/{path}'.format(path=datadir, **repo)
+#     params = dict(ref=repo['branch'])
+#     response = requests.get(root + url, headers=headers, params=params)
+#     result = response.json()
+#     print 'Getting directory:', datadir
+#     print 'Response status code:', response.status_code
+#     print inspect(result)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Execute Github API requests',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-a', '--account', default='~/.github',
+        help='File to use for token credentials')
+    parser.add_argument('-v', '--verbose', action='store_true')
+    parser.add_argument('path', help='API path')
+    opts = parser.parse_args()
+
+    account_filepath = os.path.expanduser(opts.account)
+
+    github_token = os.environ.get('GITHUB_TOKEN')
+    if not github_token and os.path.exists(account_filepath):
+        with open(account_filepath) as account_fd:
+            github_token = account_fd.read().strip()
+
+    headers = dict()
+    if github_token is not None:
+        headers['Authorization'] = 'token %s' % github_token
+    request(opts.path, headers=headers)

@@ -126,6 +126,21 @@ Until git 1.8.3 rolls around:
 
 Thanks goes to [stackoverflow](http://stackoverflow.com/questions/1260748/how-do-i-remove-a-git-submodule).
 
+# github-api
+
+Simple request and printing helper for the Github API v3 (automatically pulls in `$GITHUB_TOKEN` environment variable).
+
+    github-api /user
+    github-api /user/emails
+    github-api /user/issues
+    github-api /users/isaacs
+    github-api /orgs/utcompling/members
+    github-api /repos/chbrown/flickr-with-oauth/events | json
+
+Not yet supported:
+
+    github-api /repos/chbrown/flickr-with-oauth/issues state=closed
+
 # htpasswd.py
 
 Script originally from a guy named "Eli Carter."

@@ -9,8 +9,9 @@ root = 'https://api.github.com'
 
 
 class Printer():
-    def __init__(self):
-        interactive = sys.stdout.isatty()
+    def __init__(self, destination=sys.stdout):
+        self.destination = destination
+        interactive = destination.isatty()
         self.encoder = json.JSONEncoder(
             ensure_ascii=False,
             sort_keys=True,
@@ -19,6 +20,10 @@ class Printer():
             default=self.default)
 
     def __call__(self, obj):
+        self.destination.write(self.encode(obj).encode('utf8'))
+        self.destination.write('\n')
+
+    def encode(self, obj):
         return self.encoder.encode(obj)
 
     def default(obj):
@@ -34,10 +39,10 @@ def request(path, method='GET', headers=None, **params):
     response = requests.request(method, url, headers=headers, params=params)
     result = response.json()
     if isinstance(result, dict):
-        print printer(result)
+        printer(result)
     else:
         for entry in result:
-            print printer(entry)
+            printer(entry)
 
 # def hashes():
 #     import glob

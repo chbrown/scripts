@@ -401,6 +401,12 @@ You may need to fix the permissions on the remote's new `~/.ssh`, i.e.:
     700 .ssh
     644 .ssh/authorized_keys2
 
+# taken
+
+Like whois-domains, take a list of domains, separated by newlines, and query whois for availability, caching in redis.
+
+    echo henrian.com | taken
+
 # textext
 
 Uh, what? So it looks through lines of json and prints just the "text" attribute. I guess if you want to look as just Tweet text. Something like `npm install json` and then `cat feed.json | json -C text` would do the same thing.

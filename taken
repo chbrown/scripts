@@ -1,0 +1,69 @@
+#!/usr/bin/env python
+import re
+import sys
+import argparse
+import subprocess
+import redis
+
+redis_client = redis.StrictRedis()
+whois_quota_exceeded = re.compile('(WHOIS LIMIT EXCEEDED|quota exceeded)')
+
+
+def whois(domain):
+    redis_key = 'whois:%s' % domain
+    cached = redis_client.get(redis_key)
+    if not cached or whois_quota_exceeded.search(cached):
+        print >> sys.stderr, '$ whois ' + domain
+        cached = subprocess.check_output(['whois', domain])
+        redis_client.set(redis_key, cached)
+        redis_client.expire(redis_key, 24*60*60)  # cache for 24h
+    return cached
+
+
+class Domain(object):
+    def __init__(self, name):
+        self.name = name
+
+    @property
+    def available(self):
+        if 'Status: Not Registered' in whois(self.name):
+            return True
+        return False
+
+    @property
+    def taken(self):
+        if 'Status: Active' in whois(self.name):
+            return True
+        elif 'Status: Locked' in whois(self.name):
+            return True
+        return False
+
+    @property
+    def code(self):
+        if self.available:
+            return 'available'
+        elif self.taken:
+            return 'taken'
+        else:
+            raise Exception('Could not determine code from whois output: ' + whois(self.name))
+
+    def __str__(self):
+        return self.code + '\t' + self.name
+
+
+def main():
+    parser = argparse.ArgumentParser(description='whois check.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('domains', nargs='?', type=argparse.FileType('r'), default=sys.stdin)
+    opts = parser.parse_args()
+
+    if opts.domains == sys.stdin and sys.stdin.isatty():
+        print 'Unless you specify an input file, you must pipe in a list of domains separated by newlines.'
+        exit(1)
+
+    domains = [Domain(domain.strip()) for domain in opts.domains]
+    for domain in domains:
+        print domain
+
+if __name__ == '__main__':
+    main()

@@ -76,8 +76,7 @@ def main():
     # For now, we only care about the use cases that affect tests/functional.py
     parser = OptionParser(usage=main.__doc__)
     parser.add_option('-b', action='store_true', dest='batch', default=False,
-        help='Batch mode; password is passed on the command line IN THE CLEAR.'
-        )
+        help='Batch mode; password is passed on the command line IN THE CLEAR.')
     parser.add_option('-c', action='store_true', dest='create', default=False,
         help='Create a new htpasswd file, overwriting any existing file.')
     parser.add_option('-D', action='store_true', dest='delete_user',

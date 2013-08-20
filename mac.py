@@ -6,12 +6,14 @@ import random
 
 def random_mac_address():
     # first octet/number must be even, apparently
-    return ':'.join(['%0x' % (random.randint(0, 127)*2)] + ['%0x' % random.randint(0, 255) for i in range(5)])
+    return ':'.join(['%0x' % (random.randint(0, 127) * 2)] + ['%0x' % random.randint(0, 255) for i in range(5)])
 
 new_mac = random_mac_address()
 
+
 def gen():
     print new_mac
+
 
 def help():
     print '''
@@ -22,6 +24,7 @@ mac.py --display
 sudo mac.py
     will reset the current en0 ether address
     (You must sudo / run this as root.)'''
+
 
 def display(label):
     print label

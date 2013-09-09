@@ -1,0 +1,106 @@
+#!/usr/bin/env python
+import os
+import sys
+import subprocess
+import shutil
+import psutil
+
+import logging
+logging.basicConfig(format="%(levelname)-6s %(message)s")
+logger = logging.getLogger(__name__)
+
+
+def md5(filepath):
+    return subprocess.check_output(['md5', '-q', filepath])
+
+
+def identical_files(source, destination):
+    '''Return false if either file is missing or the sizes or the checksums do not match'''
+    # 1. check existence
+    if os.path.exists(source) and os.path.exists(destination):
+        # 2. check size
+        if os.path.getsize(source) == os.path.getsize(destination):
+            # 3. check hash
+            if md5(source) == md5(destination):
+                return True
+    return False
+
+
+def copy(source, destination, force=True):
+    if force:
+        logger.warn('cp -f %s %s', source, destination)
+        shutil.copy(source, destination)
+        # double check
+        return identical_files(source, destination)
+    elif identical_files(source, destination):
+        logger.warn('%s == %s', source, destination)
+        return True
+    else:
+        logger.error('%s != %s', source, destination)
+        logger.warn('cp %s %s', source, destination)
+        shutil.copy(source, destination)
+        # double check
+        return identical_files(source, destination)
+
+
+def get_open_filepaths():
+    paths = []
+    for proc in psutil.get_process_list():
+        try:
+            paths += [openfile.path for openfile in proc.get_open_files()]
+        except (psutil.AccessDenied, psutil.NoSuchProcess), exc:
+            logger.debug('psutil exception: %s', exc)
+    return paths
+
+
+def main():
+    import argparse
+    parser = argparse.ArgumentParser(description='Like scp but remove the files after copying')
+    parser.add_argument('sources', nargs='+', help='Source files')
+    parser.add_argument('destination', help='Destination')
+    parser.add_argument('--open', action='store_true', help='Move open files')
+    parser.add_argument('--delete', action='store_true', help='Delete files after moving them')
+    parser.add_argument('--force', action='store_true', help='Replace existing files on the remote even if they match')
+    parser.add_argument('-v', '--verbose', action='store_true', help='Print extra output (like debug messages)')
+
+    opts = parser.parse_args()
+
+    logger.setLevel(logging.INFO if opts.verbose else logging.WARN)
+    logger.debug('opts: %s', vars(opts))
+
+    open_filenames = set([os.path.basename(filepath) for filepath in get_open_filepaths()])
+
+    if len(opts.sources) > 1 and not os.path.isdir(opts.destination):
+        # if there is more than one source, the destination must be a directory
+        os.makedirs(opts.destination)
+
+    counts = dict(deleted=0, copied=0, failed=0)
+    for source in opts.sources:
+        # source must: 1) exist, 2) not be open, 3) or if it is open, --open must be set
+        if os.path.exists(source) and (opts.open or (source not in open_filenames)):
+            destination = opts.destination
+            # if the destination is a directory, expand out the full copy path here
+            if os.path.isdir(opts.destination):
+                source_basename = os.path.basename(source)
+                destination = os.path.join(opts.destination, source_basename)
+
+            success = copy(source, destination, force=opts.force)
+            if success:
+                counts['copied'] += 1
+                logger.info('%s == %s', source, destination)
+                if opts.delete:
+                    logger.warn('rm %s', source)
+                    os.remove(source)
+                    counts['deleted'] += 1
+            else:
+                counts['failed'] += 1
+                logger.error('%s != %s', source, destination)
+                if opts.delete:
+                    logger.error('not deleting %s', source)
+
+    logger.info('counts: %s', counts)
+    if counts['failed'] > 0:
+        sys.exit(1)
+
+if __name__ == '__main__':
+    main()

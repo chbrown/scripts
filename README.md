@@ -203,6 +203,8 @@ MD5 hash the last command line argument.
 
     md5py freshplum
 
+_N.b._: If given a filename, this doesn't sum a file, but the filename!
+
 # mongomigrate.rb
 
 Copy the MongoDB somewhere to somewhere else.
@@ -372,6 +374,12 @@ It outputs the filename it used, among other things.
 Little helper for the awesome `sshfs` tool that OS X Fuse provides. It'll make the given directory as needed, and die quietly if the connection already exists.
 
     sf tacc: /Volumes/tacc
+
+# smv
+
+Secure move. Like scp but remove the files after copying.
+
+    smv 2013-09-07.json.gz 2013-09-08.json.gz /mnt/backup/days_and_days --delete
 
 # soundcloud
 

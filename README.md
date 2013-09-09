@@ -13,7 +13,7 @@ echo 'export PATH=$HOME/scripts:$PATH' >> .bashrc.local
 Prerequisite for many of these scripts:
 
 ```bash
-pip install requests colorama
+pip install requests colorama chardet
 ```
 
 ## License
@@ -46,11 +46,13 @@ Watch a directory for changed files and restart a process when a change is detec
 
 From [stevekrenzel/autoreload](https://github.com/stevekrenzel/autoreload) (no license).
 
+
 # click
 
 Measured from the top left of the screen, left-click once.
 
     click -x 600 -y 400
+
 
 # cfmt
 
@@ -73,11 +75,13 @@ Get `astyle` from your package manager, e.g.:
 
     brew install astyle
 
+
 # crawl
 
 A shortcut to this `wget` sequence:
 
     wget -e robots=off --recursive --no-clobber --page-requisites --convert-links --restrict-file-names=windows $1
+
 
 # csv2html
 

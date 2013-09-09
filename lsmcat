@@ -3,13 +3,29 @@ import os
 import sys
 from datetime import datetime
 
-for filepath in sys.argv[1:]:
-    created = datetime.fromtimestamp(os.path.getmtime(filepath))
-    content = open(filepath).read().decode('utf16')
+# chardet is an external library (https://github.com/erikrose/chardet), available with `pip install chardet`
+import chardet
 
-    section = u'[{created}] {filepath}\n{content}\n\n'.format(
-        created=created.isoformat(' '),
-        filepath=filepath,
-        content=content,
-    )
-    sys.stdout.write(section.encode('utf8'))
+
+def lsm(filename, out):
+    with open(filename) as fd:
+        raw = fd.read()
+        guess = chardet.detect(raw)
+        content = raw.decode(guess['encoding'])
+
+    modified = datetime.fromtimestamp(os.path.getmtime(filename))
+    print >> out, u'[%s] %s' % (modified.isoformat(' '), filename)
+    print >> out, content.encode('utf8')
+
+
+def main():
+    import argparse
+    parser = argparse.ArgumentParser(description='Consolidate list of text files into single document, converting to UTF-8 and recording filenames and "mtime" of the original file.')
+    parser.add_argument('filenames', nargs='+', help='Files to read')
+    opts = parser.parse_args()
+
+    for filename in opts.filenames:
+        lsm(filename, sys.stdout)
+
+if __name__ == '__main__':
+    main()

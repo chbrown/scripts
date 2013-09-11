@@ -153,6 +153,14 @@ After `alphadec`'ing a password, say, `vsw8lq4NuM0S`, create an `htpasswd` file 
 
     htpasswd.py -c -b nginx.htpasswd scriptuser vsw8lq4NuM0S
 
+# intersect
+
+Collect the lines that all specified files share:
+
+    intersect users-extant.txt users-needtodelete.txt > todo.txt
+
+Each file is `uniq`ed, trailing whitespace is discarded, and output order is unspecified.
+
 # launch
 
 Simply grep for a Mac LaunchAgent that matches the given argument, and start it. Easy way to have databases around but not always use them when not developing.

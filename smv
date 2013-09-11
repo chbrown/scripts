@@ -6,7 +6,7 @@ import psutil
 import hashlib
 
 import logging
-logging.basicConfig(format="%(levelname)-6s %(message)s")
+logging.basicConfig(format="%(levelname)-7s %(message)s")
 logger = logging.getLogger(__name__)
 
 

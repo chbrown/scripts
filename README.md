@@ -13,7 +13,7 @@ echo 'export PATH=$HOME/scripts:$PATH' >> .bashrc.local
 Prerequisite for many of these scripts:
 
 ```bash
-pip install requests colorama chardet
+easy_install requests colorama chardet
 ```
 
 ## License
@@ -299,22 +299,6 @@ Like mongomigrate, but shorter (and not ruby)!
 
 Uses `ssh -C` and `pg_dump` but that's about it. You'll need to `dropdb` and `createdb`, etc., yourself.
 
-# pip-more
-
-Mostly foreach-type calls for Python packages, mainly using `pip`.
-
-* Simply do a `pip install -U <package>` on all your installed packages:
-
-        pip-more update
-
-* Print out Python's `sys.path`:
-
-        pip-more paths
-
-* Uninstall (some) Python packages that are linked with their own `.pth` files:
-
-        pip-more clean
-
 # ppjson
 
 Pretty print JSON (using Python's `json.dumps`, sorting keys and indenting by two spaces):
@@ -472,7 +456,7 @@ The destination directory is created with `os.makedirs` if it doesn't exist. See
 
 Requires `requests`, `youtube-dl`, and `redis`:
 
-    pip install requests
+    easy_install requests
     brew install youtube-dl
     brew install redis
     launch redis
@@ -492,7 +476,7 @@ Using `pyPdf`, open up a PDF, cropping the left and right sides right down the m
 
     vsplitpdf reconstruction.pdf
 
-A quick `pip install pyPdf` may be required.
+A quick `easy_install pyPdf` may be required.
 
 # wgetar
 

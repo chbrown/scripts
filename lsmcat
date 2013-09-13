@@ -3,7 +3,7 @@ import os
 import sys
 from datetime import datetime
 
-# chardet is an external library (https://github.com/erikrose/chardet), available with `pip install chardet`
+# chardet is an external library (https://github.com/erikrose/chardet), available with `easy_install chardet`
 import chardet
 
 

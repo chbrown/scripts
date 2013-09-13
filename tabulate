@@ -1,0 +1,54 @@
+#!/usr/bin/env python
+import sys
+import argparse
+from collections import Counter
+
+
+def bound(minimum, x, maximum):
+    return min(max(x, minimum), maximum)
+
+
+def format(counts, style):
+    # counts is a list / iterable of (count, line) pairs
+    if style == 'csv':
+        print 'count,value'
+        for pair in counts:
+            print ','.join(pair)
+    elif style == 'tsv':
+        print 'count\tvalue'
+        for pair in counts:
+            print '\t'.join(pair)
+    else:
+        # markdown
+        counts = list(counts)  # we'll need it more than once
+
+        count_max_len = max(len(count) for count, _ in counts)
+        value_max_len = max(len(value) for _, value in counts)
+
+        # 5 is len('count')
+        count_width = bound(5, count_max_len, 10)
+        value_width = bound(5, value_max_len, 70)
+
+        print '| %s | %s |' % ('count'.center(count_width), 'value'.center(value_width))
+        # 2 for the gutter
+        print '|%s|%s|' % (':'.rjust(count_width + 2, '-'), ':'.ljust(value_width + 2, '-'))
+        for count, value in counts:
+            print '| %s | %s |' % (count.rjust(count_width), value.ljust(value_width))
+
+
+def main():
+    parser = argparse.ArgumentParser(description='sort | uniq -c | sort -g # but with formatting',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-r', '--desc', action='store_true', help='More common values first')
+    parser.add_argument('-f', '--format', choices=['tsv', 'csv', 'markdown'], help='Format', default='tsv')
+    opts = parser.parse_args()
+
+    counter = Counter(line.rstrip() for line in sys.stdin)
+    ordered_pairs = sorted(counter.iteritems(), key=lambda pair: pair[1], reverse=opts.desc)
+    # ordered_pairs is now a properly ordered list of (line, count) pairs
+    ordered_counts = ((str(count), line) for line, count in ordered_pairs)
+    # ordered_counts is now a properly ordered list of (count, line) pairs
+    format(ordered_counts, opts.format)
+
+if __name__ == '__main__':
+    main()

@@ -405,6 +405,42 @@ You may need to fix the permissions on the remote's new `~/.ssh`, i.e.:
     700 .ssh
     644 .ssh/authorized_keys2
 
+# tabulate
+
+Like `sort | uniq -c | sort -g`, but with nice formatting. E.g.,
+
+    </usr/share/dict/words cut -c -1 | tabulate --format markdown
+
+Outputs this:
+
+    | count | value |
+    |------:|:------|
+    |    77 | Q     |
+    |    92 | X     |
+    |   139 | Y     |
+    |   208 | U     |
+    ... only a snippet shown here ...
+    | 14537 | a     |
+    | 16179 | u     |
+    | 17406 | c     |
+    | 22171 | p     |
+    | 22759 | s     |
+
+Which renders into this:
+
+| count | value |
+|------:|:------|
+|    77 | Q     |
+|    92 | X     |
+|   139 | Y     |
+|   208 | U     |
+|   ... | ...   |
+| 14537 | a     |
+| 16179 | u     |
+| 17406 | c     |
+| 22171 | p     |
+| 22759 | s     |
+
 # taken
 
 Like whois-domains, take a list of domains, separated by newlines, and query whois for availability, caching in redis.

@@ -1,0 +1,20 @@
+{
+  "name": "scripts",
+  "version": "0.2.0",
+  "description": "Handy scripts",
+  "keywords": ["scripts"],
+  "homepage": "https://github.com/chbrown/scripts",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/chbrown/scripts.git"
+  },
+  "author": "Christopher Brown <io@henrian.com> (http://henrian.com)",
+  "license": "MIT",
+  "dependencies": {
+    "async": "*",
+    "marked": "*",
+    "optimist": "*",
+    "streaming": "*"
+  },
+  "private": true
+}

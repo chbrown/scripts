@@ -205,6 +205,14 @@ Reset your current MAC address to a random new one:
 
     sudo mac.py
 
+# md
+
+marked + standard header + open
+
+    md somedoc.md
+
+Create `somedoc.html` by rendering the markdown in `somedoc.md` and prepending with (by default) `~/.standardhead.html`. Then run `open` to view the html in your default browser.
+
 # md5py
 
 MD5 hash the last command line argument.

@@ -2,33 +2,33 @@
 import os
 import re
 import argparse
-from PIL import Image
-
-extension_re = re.compile(r'(\.\w{2,5})$')
+# from PIL:
+import Image
 
 parser = argparse.ArgumentParser(description='Image cropper (uses PIL)')
 parser.add_argument('filepaths', nargs='+')
-parser.add_argument('-d', '--destination')
+parser.add_argument('-d', '--destination', help='Destination directory (defaults to same directory as input files)')
+parser.add_argument('-q', '--quality', type=int, default=95, help='Default quality in JPG output')
+
 opts = parser.parse_args()
 
 
-for filepath in opts.filepaths:
-    image = Image.open(filepath)
+for original_filepath in opts.filepaths:
+    image = Image.open(original_filepath)
     width, height = image.size
     half_width = width // 2
     # crops are specified as a "box" tuple of (left, upper, right, lower)
     # origin (0, 0) is the top left
     left = image.crop((0, 0, half_width, height))
     right = image.crop((half_width, 0, width, height))
-    # , 'JPEG'
-    # we want to save with the same jpeg quantization table
-    # filename = filename.replace('jpg', 'png')
-    if opts.destination:
-        filepath = os.path.join(opts.destination, os.path.basename(filepath))
 
-    left_path = extension_re.sub(r'-left\1', filepath)
-    right_path = extension_re.sub(r'-right\1', filepath)
+    original_basename = os.path.basename(original_filepath)
+    split_filepath = os.path.join(opts.destination, original_basename) if opts.destination else original_filepath
 
-    quality = 95
-    left.save(left_path, quality=quality)
-    right.save(right_path, quality=quality)
+    left_path = re.sub(r'(\.\w{2,5})$', r'-left\1', split_filepath)
+    right_path = re.sub(r'(\.\w{2,5})$', r'-right\1', split_filepath)
+
+    print '%s -> [%s, %s]' % (original_filepath, left_path, right_path)
+    # we would like to save with the same jpeg quantization table, but that's really hard, apparently
+    left.save(left_path, quality=opts.quality)
+    right.save(right_path, quality=opts.quality)

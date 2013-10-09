@@ -7,7 +7,12 @@ var child_process = require('child_process');
 // marked.setOptions({});
 
 var optimist = require('optimist')
-  .usage('md doc.md')
+  .usage([
+    'Usage: md doc.md',
+    '',
+    'This will render the specified Markdown file to html, simply swapping the extension, e.g., "doc.html"',
+    'Alternatively, it can look for the first *.md in the current directory, and render that.',
+  ].join('\n'))
   .describe({
     input: 'Markdown input',
     output: 'HTML output',

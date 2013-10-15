@@ -315,11 +315,11 @@ Pretty print JSON (using Python's `json.dumps`, sorting keys and indenting by tw
 
 # ppxml
 
-Pretty print xml, using Python's `BeautifulSoup`.
+Pretty print XML using [`lxml`](http://lxml.de/) (or [`BeautifulSoup`](http://www.crummy.com/software/BeautifulSoup/), if you use the flag `-f soup`).
 
-    ppxml timeml/APW19980322.0749.tml
+    ppxml APW19980322.0749.tml
 
-Not like xml gets pretty. It just gets pretti*er*.
+Not like XML gets pretty. It just gets pretti*er*.
 
 # prependbom
 

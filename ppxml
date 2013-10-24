@@ -13,6 +13,7 @@ def lxml(infile, outfile):
 
     parser = etree.XMLParser(remove_blank_text=True)
     tree = etree.parse(infile, parser)
+    etree.cleanup_namespaces(tree)
 
     outfile.write(etree.tostring(tree, pretty_print=True))
 

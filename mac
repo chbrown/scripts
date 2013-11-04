@@ -1,0 +1,78 @@
+#!/usr/bin/env python
+# import sys
+import re
+import os
+import random
+import argparse
+
+
+class MacAddress(object):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        hex_value = '%x' % self.value
+        # this little iter(...)*2 is cleverer than I, see
+        # http://stackoverflow.com/questions/1624883/alternative-way-to-split-a-list-into-groups-of-n
+        hex_pairs = zip(*(iter(hex_value),)*2)
+        return ':'.join(map(''.join, hex_pairs))
+
+    @classmethod
+    def random(cls):
+        # first octet/number must be even, apparently
+        # any 48-bit number, i.e., a number between 0 and 2^48
+        # octets = [random.randint(0, 127) * 2] + [random.randint(0, 255) for _ in range(5)]
+        # octets << 8
+        # return format_mac(':'.join(['%0x' % octet for octet in octets])
+        return cls(random.randint(0, 1 << 48))
+
+    @classmethod
+    def current(cls):
+        en0 = os.popen('ifconfig en0').read()
+        match = re.search('ether ([A-Za-z0-9:]+)', en0)
+        hex_value = match.group(1)
+
+        return cls(int(hex_value.replace(':', ''), 16))
+
+
+# actions:
+
+
+def generate(opts):
+    '''Print a random valid MAC address to STDOUT'''
+    print MacAddress.random()
+
+
+def reset(opts):
+    '''Reset the current en0 ether address. You must sudo / run this as root.'''
+    previous = MacAddress.current()
+
+    random_mac_address = MacAddress.random()
+    # disassociate your wi-fi connection:
+    os.system('airport -z')
+    # set to the new address:
+    os.system('ifconfig en0 ether "%s"' % random_mac_address)
+    result = MacAddress.current()
+    print '%s -> %s' % (previous, result)
+
+
+def info(opts):
+    '''Print the current MAC address'''
+    print MacAddress.current()
+
+
+def main():
+    actions = dict(generate=generate, reset=reset, info=info)
+    uid = os.geteuid()
+    default_action = 'reset' if uid == 0 else 'info'
+
+    parser = argparse.ArgumentParser(description='Usage: Change MAC address',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('action', choices=actions, nargs='?', help='Action', default=default_action)
+
+    opts = parser.parse_args()
+    actions[opts.action](opts)
+
+
+if __name__ == '__main__':
+    main()

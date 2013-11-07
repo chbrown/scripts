@@ -1,22 +1,31 @@
 #!/usr/bin/env python
 import random
 import argparse
+import string
 
-parser = argparse.ArgumentParser(description='Generate random characters.')
+populations = dict(
+    all=string.uppercase + string.lowercase + string.digits,
+    alpha=string.uppercase + string.lowercase,
+    uppercase=string.uppercase,
+    lowercase=string.lowercase,
+    digits=string.digits,
+    upperdigits=string.digits + string.uppercase,
+    lowerdigits=string.digits + string.lowercase,
+    upperhex=string.digits + 'ABCDEF',
+    lowerhex=string.digits + 'abcdef',
+)
+
+
+parser = argparse.ArgumentParser(description='Generate random strings',
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('--length', '-l', type=int, help='Length of each password', default=12)
 parser.add_argument('--count', '-c', type=int, help='Number of passwords', default=1)
-args = parser.parse_args()
 
-ALPHADEC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+parser.add_argument('--population', '-p', choices=populations, help='Population to sample from', default='all')
+opts = parser.parse_args()
 
+pop = populations[opts.population]
 
-def sample(population, k, replacement=False):
-    if args.length > len(ALPHADEC):
-        replacement = True
-    if replacement is False:
-        return random.sample(population, k)
-    else:
-        return sum((random.sample(population, 1) for _ in range(k)), [])
-
-for i in range(args.count):
-    print ''.join(sample(ALPHADEC, args.length))
+for i in range(opts.count):
+    # always sample with replacement
+    print ''.join(pop[random.randrange(len(pop))] for _ in range(opts.length))

@@ -114,6 +114,12 @@ One-liner for when you have some lengthy lines and you want to kill the wrap:
 
     tr '\t' ' ' | cut -c -$(tput cols)
 
+# fixpdf
+
+Wrapper around `gs` command, with reasonable options and a default conversion filename (append `-gs` to basename):
+
+    fixpdf Bulky.pdf
+
 # git-remote-tags
 
 Wrapping around `git ls-remote --tags git://...` to get the good stuff:

@@ -3,12 +3,14 @@ import argparse
 import subprocess
 import tempfile
 
+
 def sh(*args):
     args = map(str, args)
     print '$ %s' % ' '.join(args)
     return subprocess.check_call(args)
 
-parser = argparse.ArgumentParser(description='Watermark only the selected page of a PDF with another PDF.')
+parser = argparse.ArgumentParser(description='Watermark only the selected page of a PDF with another PDF.',
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('original', help='The PDF you want to add a stamp to')
 parser.add_argument('stamp', help='The watermark PDF')
 parser.add_argument('--page', type=int, default=1, help='The page to watermark')

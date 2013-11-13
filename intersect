@@ -2,7 +2,8 @@
 import argparse
 from collections import Counter
 
-parser = argparse.ArgumentParser(description='Find lines shared by all files.')
+parser = argparse.ArgumentParser(description='Find lines shared by all files.',
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('filenames', nargs='+')
 opts = parser.parse_args()
 

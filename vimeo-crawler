@@ -90,7 +90,8 @@ def id_collector(channels, page_count):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Vimeo channel downloader.')
+    parser = argparse.ArgumentParser(description='Vimeo channel downloader.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-c', '--channels', nargs='+', help='e.g., staffpicks hd everythinganimated')
     parser.add_argument('-p', '--page-count', type=int, default=3)
     parser.add_argument('-d', '--destination', default='~/Movies/vimeo')

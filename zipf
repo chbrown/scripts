@@ -4,7 +4,8 @@ import argparse
 import re
 from collections import Counter
 
-parser = argparse.ArgumentParser(description='Token / type comparator')
+parser = argparse.ArgumentParser(description='Token / type comparator',
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('-c', '--case-sensitive', action='store_true', help='retain case')
 parser.add_argument('-t', '--top', default=200, type=int, help='output lines')
 parser.add_argument('-r', '--regex', default=r'\w+', help='token match')

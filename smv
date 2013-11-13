@@ -69,7 +69,8 @@ def get_open_filepaths():
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(description='Like scp but remove the files after copying')
+    parser = argparse.ArgumentParser(description='Like scp but remove the files after copying',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('sources', nargs='+', help='Source files')
     parser.add_argument('destination', help='Destination')
     parser.add_argument('--open', action='store_true', help='Move open files')

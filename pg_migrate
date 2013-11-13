@@ -8,7 +8,8 @@ import argparse
 #     print '$ %s' % ' '.join(args)
 #     return subprocess.check_output(args)
 
-parser = argparse.ArgumentParser(description='PostgreSQL migration development tool')
+parser = argparse.ArgumentParser(description='PostgreSQL migration development tool',
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('src', help='[SOURCE:]DATABASE')
 parser.add_argument('dst', help='[DESTINATION:]DATABASE = defaults to "localhost".')
 args = parser.parse_args()

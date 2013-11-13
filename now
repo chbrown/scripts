@@ -47,8 +47,7 @@ def format_now(timezone=None, date=False, time=False, file=False, eol=False, **k
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description='Date & time formatting',
+    parser = argparse.ArgumentParser(description='Date & time formatting',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     # timezone=None, date=False, time=False, file=False, eol=False
     parser.add_argument('-u', '--utc', action='store_true', help='Shortcut for --timezone UTC')

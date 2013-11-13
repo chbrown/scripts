@@ -4,6 +4,7 @@ import subprocess
 import argparse
 import errno
 
+
 def mkdir_p(path):
     try:
         os.makedirs(path)
@@ -11,12 +12,14 @@ def mkdir_p(path):
         if exc.errno != errno.EEXIST:
             raise
 
+
 def sh(args):
     print '$ %s' % ' '.join(args)
     subprocess.check_output(args)
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='SSHFS setup tool.')
+    parser = argparse.ArgumentParser(description='SSHFS setup tool.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('remote')
     parser.add_argument('local', nargs='?')
     opts = parser.parse_args()

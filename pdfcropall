@@ -10,7 +10,8 @@ def flatten_glob_list(fileglobs):
             yield filepath
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='PDF Cropper')
+    parser = argparse.ArgumentParser(description='PDF Cropper',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('files', nargs='*', default='*.pdf')
     parser.add_argument('--force', action='store_true')
     opts = parser.parse_args()

@@ -24,7 +24,8 @@ def main():
     import argparse
     formatters = dict(soup=soup, lxml=lxml)
 
-    parser = argparse.ArgumentParser(description='Prettyprint XML')
+    parser = argparse.ArgumentParser(description='Prettyprint XML',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('infile', nargs='?', type=argparse.FileType('r'), default=sys.stdin,
         help='Ugly XML path (defaults to STDIN)')
     parser.add_argument('outfile', nargs='?', type=argparse.FileType('w'), default=sys.stdout,

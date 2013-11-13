@@ -2,7 +2,8 @@
 import sys
 import argparse
 
-parser = argparse.ArgumentParser(description='Find all lines after the last occurrence in a file or STDIN.')
+parser = argparse.ArgumentParser(description='Find all lines after the last occurrence in a file or STDIN.',
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('--last', action='store_true')
 parser.add_argument('pattern')
 parser.add_argument('files', nargs='*')

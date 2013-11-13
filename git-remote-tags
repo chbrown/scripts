@@ -2,7 +2,8 @@
 import subprocess
 import argparse
 
-parser = argparse.ArgumentParser(description='git-ls-remote --tags without the fluff')
+parser = argparse.ArgumentParser(description='git-ls-remote --tags without the fluff',
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('repository_url')
 opts = parser.parse_args()
 

@@ -6,7 +6,8 @@ import re
 import argparse
 import requests
 
-parser = argparse.ArgumentParser(description='Soundcloud downloader')
+parser = argparse.ArgumentParser(description='Soundcloud downloader',
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('urls', nargs='+', help='Url(s) to page with links')
 args = parser.parse_args()
 

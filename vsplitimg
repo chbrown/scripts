@@ -5,7 +5,8 @@ import argparse
 # from PIL:
 import Image
 
-parser = argparse.ArgumentParser(description='Image cropper (uses PIL)')
+parser = argparse.ArgumentParser(description='Image cropper (uses PIL)',
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('filepaths', nargs='+')
 parser.add_argument('-d', '--destination', help='Destination directory (defaults to same directory as input files)')
 parser.add_argument('-q', '--quality', type=int, default=95, help='Default quality in JPG output')

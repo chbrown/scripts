@@ -134,7 +134,8 @@ def resolve_uri_to_node(uri, s3_connection):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Compare S3 and local files')
+    parser = argparse.ArgumentParser(description='Compare S3 and local files',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('left')
     parser.add_argument('right')
     parser.add_argument('--verbose', action='store_true', help='Print successes, too.')

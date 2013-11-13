@@ -4,7 +4,8 @@ import os
 from subprocess import Popen, PIPE
 from colorama import Fore  # , Back, Style
 
-parser = argparse.ArgumentParser(description='mysqlimport + mysqlcreatedb')
+parser = argparse.ArgumentParser(description='mysqlimport + mysqlcreatedb',
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('database', help='MySQL database')
 parser.add_argument('csv', help='CSV file to load')
 parser.add_argument('-u', '--user', default=os.getlogin())

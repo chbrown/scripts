@@ -20,7 +20,8 @@ def lsm(filename, out):
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(description='Consolidate list of text files into single document, converting to UTF-8 and recording filenames and "mtime" of the original file.')
+    parser = argparse.ArgumentParser(description='Consolidate list of text files into single document, converting to UTF-8 and recording filenames and "mtime" of the original file.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('filenames', nargs='+', help='Files to read')
     opts = parser.parse_args()
 

@@ -5,7 +5,7 @@ import re
 from subprocess import Popen, PIPE
 from colorama import Fore
 
-committed_re = re.compile(r'^## [-a-z]+\s*$')
+committed_re = re.compile(r'^## ([-a-z]+)...origin/\1\s*$')
 
 parser = argparse.ArgumentParser(
     description='Print statuses for a list of git repositories',

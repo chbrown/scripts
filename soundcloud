@@ -13,13 +13,16 @@ args = parser.parse_args()
 
 headers = {'user-agent': 'Mozilla/5.0'}
 
+
 def download_stream(stream, title):
     unicode_title = title.decode('unicode-escape')
     r = requests.get(stream, headers=headers)
-    mp3 = '%s.mp3' % unicode_title
-    print 'Downloading %s' % mp3
+    # sanitize any slashes out of the title to make it filepath-safe
+    mp3 = '%s.mp3' % unicode_title.replace('/', '-')
+    print 'Downloading "%s"' % mp3
     with open(mp3, 'wb') as fp:
         fp.write(r.content)
+
 
 def download_url(url):
     r = requests.get(url, headers=headers)
@@ -35,6 +38,7 @@ def download_url(url):
         titles = re.findall(r'"title"\s*:\s*"([^"]+)"', r.text)
         for stream, title in zip(streams, titles):
             download_stream(stream, title)
+
 
 for url in args.urls:
     download_url(url)

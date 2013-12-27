@@ -29,15 +29,21 @@ def seek_to_beginning_of_final_whitespace(fp, max_offset=None):
     if max_offset is None:
         max_offset = fp.tell()
     # find location of last non-whitespace character by starting at the end and working backward
-    for offset in range(1, max_offset):
-        # if the second argument of seek is 2, first argument is relative to the end of the file
+    for offset in range(1, max_offset + 1):
+        # if the second argument of seek (whence) is 2,
+        #   the first argument (offset) is evaluated relative to the end of the file
         fp.seek(-offset, 2)
         char = fp.read(1)
         if not char.isspace():
-            # logger.debug('Returning with %s at %d', char, fp.tell())
             # we just read over the last non-whitespace character, so the
             # current file position is now at the first of the final whitespace
-            return
+            break
+    else:
+        # the else: after a for: loop is executed only if the for loop runs to exhaustion (no break)
+        # if we seek all the way to the beginning without finding a single non-whitespace character,
+        # then there are none, and we should set the file position to the very top of the file
+        fp.seek(0)
+    # logger.debug('Set file position to %d, last read %r', fp.tell(), char)
 
 
 def ivars(obj, private=False):

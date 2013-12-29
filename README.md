@@ -419,6 +419,18 @@ You may need to fix the permissions on the remote's new `~/.ssh`, i.e.:
     700 .ssh
     644 .ssh/authorized_keys2
 
+# style
+
+Recursively check files in the specified directories for trailing whitespace and zero/multiple newlines at EOF.
+
+    style ~/github/
+
+Add `--fix` to automatically remove the misplaced whitespace (in place, no backups).
+
+This can be destructive since it recurses over all files, including binaries; it might be wise to specify exactly which files when using `--fix`:
+
+    style --fix ~/github/**/*.py
+
 # tabulate
 
 Like `sort | uniq -c | sort -g`, but with nice formatting. E.g.,

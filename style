@@ -117,38 +117,36 @@ class Fix(MethodRunner):
             fp.write('\n')
 
 
-action_classes = dict(test=Test, fix=Fix)
-
 def main():
     import argparse
     parser = argparse.ArgumentParser(description='Test or apply styles',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('action', choices=action_classes, nargs='?', default='test', help='Action to perform')
     parser.add_argument('files', nargs='*', default=['.'], help='Files / directories to read')
+    parser.add_argument('-f', '--fix', action='store_true', help='Fix files that fail tests (potentially destructive, be careful!)')
     parser.add_argument('-v', '--verbose', action='store_true', help='Print extra information')
     parser.add_argument('-q', '--quiet', action='store_true', help='Print less information (overrides --verbose)')
+    # parser.add_argument('-a', '--auto', action='store_true', help='Ignore files in .gitignore, etc.')
     opts = parser.parse_args()
 
+    # DEBUG=10, WARN=30, ERROR=40
     level = logging.WARN
     if opts.verbose:
         level = logging.DEBUG
     if opts.quiet:
         # quiet trumps verbose
         level = logging.ERROR
-
-    # DEBUG=10, WARN=30
     logging.basicConfig(format='%(levelname)-8s %(message)s', level=level)
 
-    ActionClass = action_classes[opts.action]
-
-    # log current settings
-    # logger.debug("%sing: %s with %s", opts.action, ', '.join(opts.files), ActionClass)
-
     for filepath in walkall(opts.files):
-        # logger.debug('Calling %s on %s', ActionClass.__run__, filepath)
-        for method_name, result in ActionClass.__run__(filepath):
-            if result:
-                logger.error('%s.%s(%s): %s', ActionClass.__name__, method_name, filepath, result)
+        for method_name, test_result in Test.__run__(filepath):
+            if test_result:
+                logger.error('TEST[%s] %r: %s', method_name, filepath, test_result)
+
+        # just fix everything, actually
+        if opts.fix:
+            for method_name, fix_result in Fix.__run__(filepath):
+                if fix_result:
+                    logger.debug('FIX[%s] %r: %s', method_name, filepath, fix_result)
 
 if __name__ == '__main__':
     main()

@@ -3,6 +3,8 @@ import sys
 import json
 from datetime import datetime, date
 
+# requirements: PyYAML
+
 import yaml
 try:
     from yaml import CLoader as Loader

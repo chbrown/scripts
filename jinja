@@ -1,0 +1,50 @@
+#!/usr/bin/env python
+import sys
+import yaml
+import json
+
+# requirements: jinja2 PyYAML
+
+from jinja2 import Environment
+jinja_env = Environment(trim_blocks=True, lstrip_blocks=True)
+
+
+def main():
+    import argparse
+    parser = argparse.ArgumentParser(description='Render template from JSON or YAML stream',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('input', nargs='?', type=argparse.FileType('r'), default=sys.stdin,
+        help='JSON/YAML path (defaults to STDIN)')
+    parser.add_argument('template', type=argparse.FileType('r'),
+        help='Template path')
+    parser.add_argument('output', nargs='?', type=argparse.FileType('w'), default=sys.stdout,
+        help='Rendered output destination (defaults to STDOUT)')
+    parser.add_argument('--verbose', action='store_true',
+        help='Log context to STDERR after parsing')
+    opts = parser.parse_args()
+
+    # since we have to read over the context twice if our first pass at JSON parsing fails, read to string
+    context_string = opts.input.read()
+
+    try:
+        # assume JSON, fallback to YAML
+        context = json.loads(context_string)
+    except ValueError:
+        context = yaml.load(context_string)
+
+    template = jinja_env.from_string(opts.template.read())
+    # use special name: 'c' for context
+    if isinstance(context, dict):
+        context['c'] = context
+    else:
+        context = dict(c=context)
+
+    if opts.verbose:
+        from pprint import pprint
+        pprint(context, stream=sys.stderr)
+
+    result = template.render(**context)
+    print result.encode('utf8')
+
+if __name__ == '__main__':
+    main()

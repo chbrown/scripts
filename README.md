@@ -13,7 +13,7 @@ echo 'export PATH=$HOME/scripts:$PATH' >> .bashrc.local
 Prerequisite for many of these scripts:
 
 ```bash
-easy_install requests colorama chardet
+easy_install requests colorama chardet jinja2 PyYAML
 ```
 
 ## License
@@ -166,6 +166,48 @@ Collect the lines that all specified files share:
     intersect users-extant.txt users-needtodelete.txt > todo.txt
 
 Each file is `uniq`ed, trailing whitespace is discarded, and output order is unspecified.
+
+# jinja
+
+Simple wrapper around [jinja2](http://jinja.pocoo.org/docs/) to render a common template with variable input.
+Not sure why the `jinja2` package doesn't provide this, at least as a `python -m ...` call.
+
+Input can be specifed as a filename, but defaults to STDIN.
+It can be in either JSON or YAML format.
+
+`email.jinja.md` contents:
+
+    # {{ subject.title() }} from {{ from }}
+
+    Sent to:
+    {% for recipient in [to] + cc %}
+    * {{ recipient }}
+    {% endfor %}
+
+    Body:
+    > {{ body }}
+
+`email.json` contents:
+
+    {
+        "subject": "Greetings!",
+        "from": "@chbrown",
+        "to": "supervisor@lesspress.net",
+        "cc": ["lefty@other.com", "gels@schenectady.org"],
+        "body": "Hey lemme know if you got this..."
+    }
+
+Running `cat email.json | jinja email.jinja.md` produces the following:
+
+    # Greetings! from @chbrown
+
+    Sent to:
+    * supervisor@lesspress.net
+    * lefty@other.com
+    * gels@schenectady.org
+
+    Body:
+    > Hey lemme know if you got this...
 
 # launch
 
@@ -559,7 +601,8 @@ whois-domains ~/domains.yaml
 
 # yaml2json
 
-Using Python's yaml and json modules, read in yaml and output json. Useful because Node.js's YAML support used to suck.
+Using Python's yaml and json modules, read in yaml and output json.
+Useful because Node.js's YAML support used to suck.
 
     cat simple_spec.yaml | yaml2json > simple_spec.json
 

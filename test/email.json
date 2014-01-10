@@ -1,0 +1,7 @@
+{
+    "subject": "Greetings!",
+    "from": "@chbrown",
+    "to": "supervisor@lesspress.net",
+    "cc": ["lefty@other.com", "gels@schenectady.org"],
+    "body": "Hey lemme know if you got this..."
+}

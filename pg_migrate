@@ -1,30 +1,45 @@
 #!/usr/bin/env python
 import os
-# import subprocess
 import argparse
 
-# def run(*args):
-#     args = map(str, args)
-#     print '$ %s' % ' '.join(args)
-#     return subprocess.check_output(args)
 
-parser = argparse.ArgumentParser(description='PostgreSQL migration development tool',
-    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('src', help='[SOURCE:]DATABASE')
-parser.add_argument('dst', help='[DESTINATION:]DATABASE = defaults to "localhost".')
-args = parser.parse_args()
+def shell(command, verbose=False):
+    if verbose:
+        print '$', command
+    return os.system(command)
 
-src_host, src_db = args.src.split(':') if ':' in args.src else ('localhost', args.src)
-dst_host, dst_db = args.dst.split(':') if ':' in args.dst else ('localhost', args.dst)
 
-if src_host == 'localhost' and dst_host == 'localhost':
-    os.system('pg_dump %s" | psql %s' % (src_db, dst_db))
-elif dst_host == 'localhost':
-    os.system('ssh -C %s "pg_dump %s" | psql %s' % (src_host, src_db, dst_db))
-elif src_host == 'localhost':
-    os.system('pg_dump %s | ssh -C %s "psql %s"' % (src_db, dst_host, dst_db))
-else:
-    print 'Sorry, remote-to-remote is not yet supported.'
-    # puts_system "sed 's/postgres/chbrown/g' #{local_path}.postgres_user > #{local_path}"
-    # puts_system "dropdb #{db} && createdb #{db}"
-    # puts_system "gunzip -c #{local_path} | psql #{db}"
+def split(string):
+    host, _, database = string.partition(':')
+    if host and database:
+        return host, database
+    raise Exception('Cannot infer host and database from %r' % string)
+
+
+def main():
+    parser = argparse.ArgumentParser(description='PostgreSQL migration development tool',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('source', help='SOURCE:DATABASE')
+    parser.add_argument('destination', help='DESTINATION:DATABASE')
+    parser.add_argument('-v', '--verbose', action='store_true', help='print extra output')
+    opts = parser.parse_args()
+
+    source_host, source_db = split(opts.source)
+    destination_host, destination_db = split(opts.destination)
+
+    if source_host == 'localhost' and destination_host == 'localhost':
+        command = 'pg_dump %s" | psql %s' % (source_db, destination_db)
+    elif destination_host == 'localhost':
+        command = 'ssh -C %s "pg_dump %s" | psql %s' % (source_host, source_db, destination_db)
+    elif source_host == 'localhost':
+        command = 'pg_dump %s | ssh -C %s "psql %s"' % (source_db, destination_host, destination_db)
+    else:
+        raise NotImplementedError('Sorry, remote-to-remote is not yet supported.')
+
+    retcode = shell(command, opts.verbose)
+    if retcode != 0:
+        print 'You may need to create the database locally first'
+        print 'e.g.: dropdb %s; createdb %s' % (destination_db, destination_db)
+    return retcode
+
+exit(main())

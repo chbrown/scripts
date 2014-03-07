@@ -34,11 +34,16 @@ class Printer():
 printer = Printer()
 
 
-def request(url, method='GET', headers=None, **params):
+def request(url, method='GET', headers=None, verbose=False, **params):
     # only prepend the path with the API root if the path does not already contain the root
     if root not in url:
         url = root + url
     response = requests.request(method, url, headers=headers, params=params)
+
+    if verbose:
+        for header_key, header_value in response.headers.items():
+            print '; %s=%s' % (header_key, header_value)
+
     result = response.json()
     if isinstance(result, dict):
         printer(result)
@@ -98,4 +103,4 @@ opts = parser.parse_args()
 
 github_token = get_github_token(opts.token, opts.token_file)
 headers = dict(Authorization='token %s' % github_token) if github_token else None
-request(opts.path, headers=headers)
+request(opts.path, headers=headers, verbose=opts.verbose)

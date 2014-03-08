@@ -1,0 +1,51 @@
+#!/usr/bin/env python
+import argparse
+import logging
+import subprocess
+logger = logging.getLogger(__name__)
+
+
+def shell(args):
+    print '$', ' '.join(args)
+    return subprocess.call(args)
+
+
+def crun(compiler, filename, args, flags):
+    compile_args = [compiler] + flags.split() + [filename]
+    run_args = ['a.out'] + args
+
+    compiler_returncode = shell(compile_args)
+    if compiler_returncode != 0:
+        logger.info('Not calling "%s" due to compile error', ' '.join(run_args))
+
+    shell(run_args)
+
+
+def main():
+    # should be called with the source code file as the first argument ($1),
+    # and then with the rest of the commands to send to the executable (${@:2}).
+    # e.g., "crun objcsrc.m -l test.log"
+    parser = argparse.ArgumentParser(
+        description='Compile and run C from source in just one command',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--verbose', action='store_true',
+        help='Log extra information')
+    # parser.add_argument('-n', '--dry-run', action='store_true',
+    #     help='Do not actually create any files')
+    parser.add_argument('file',
+        help='C file with main() method')
+    parser.add_argument('--compiler', choices=['clang'], default='clang',
+        help='compiler executable')
+    parser.add_argument('--flags', default='-Wall -framework Foundation -framework AppKit',
+        help='flags to use when compiling')
+    parser.add_argument('args', nargs='*',
+        help='arguments to use when calling executable; use "--" if needed')
+    opts = parser.parse_args()
+
+    logging.basicConfig(level=logging.DEBUG if opts.verbose else logging.INFO)
+
+    crun(opts.compiler, opts.file, opts.args, opts.flags)
+
+
+if __name__ == '__main__':
+    main()

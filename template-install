@@ -78,10 +78,11 @@ def main():
     parser.add_argument('template', choices=available_templates, help='Type of project')
     opts, _ = parser.parse_known_args()
 
+    template_path = os.path.join(opts.source, opts.template)
     env = os.environ
     values = {}
 
-    variable_names_in_template = set(find_variables('.')) | set(['name'])
+    variable_names_in_template = set(find_variables(template_path)) | set(['NAME'])
     for variable_name in variable_names_in_template:
         default = env.get(variable_name)
         kw = dict(help='Template variable')
@@ -95,14 +96,13 @@ def main():
     # name is always a required variable
     # but the destination default value depends on that the name value
     parser.add_argument('--destination', nargs='?', help='Directory to install at',
-        default=os.path.join(os.getcwd(), opts.name))
+        default=os.path.join(os.getcwd(), opts.NAME))
     opts = parser.parse_args()
 
     values = vars(opts)
     for name, value in values.items():
         logger.debug('%s = %s', name, value)
 
-    template_path = os.path.join(opts.source, opts.template)
     copy_interpolate(template_path, opts.destination, values)
     logger.debug('Done')
 

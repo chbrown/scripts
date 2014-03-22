@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-pdftotext $1 - | wc -w
+pdftotext "$1" - | wc -w

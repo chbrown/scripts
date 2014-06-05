@@ -41,12 +41,17 @@ def main():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-r', '--desc', action='store_true', help='More common values first')
     parser.add_argument('-f', '--format', choices=['tsv', 'csv', 'markdown'], help='Format', default='tsv')
+    parser.add_argument('-n', '--normalize', action='store_true', help='Normalize counts to percentages')
     opts = parser.parse_args()
 
     counter = Counter(line.rstrip() for line in sys.stdin)
     ordered_pairs = sorted(counter.iteritems(), key=lambda pair: pair[1], reverse=opts.desc)
     # ordered_pairs is now a properly ordered list of (line, count) pairs
-    ordered_counts = ((str(count), line) for line, count in ordered_pairs)
+    if opts.normalize:
+        total = float(sum(count for line, count in ordered_pairs))
+        ordered_counts = [('{:.2%}'.format(count / total), line) for line, count in ordered_pairs]
+    else:
+        ordered_counts = [(str(count), line) for line, count in ordered_pairs]
     # ordered_counts is now a properly ordered list of (count, line) pairs
     format(ordered_counts, opts.format)
 

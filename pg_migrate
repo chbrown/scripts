@@ -28,7 +28,7 @@ def main():
     destination_host, destination_db = split(opts.destination)
 
     if source_host == 'localhost' and destination_host == 'localhost':
-        command = 'pg_dump %s" | psql %s' % (source_db, destination_db)
+        command = 'pg_dump %s | psql %s' % (source_db, destination_db)
     elif destination_host == 'localhost':
         command = 'ssh -C %s "pg_dump %s" | psql %s' % (source_host, source_db, destination_db)
     elif source_host == 'localhost':

@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 def attachments(message, content_type='application/pdf'):
     assert message.is_multipart(), 'Cannot get attachments from a non-multipart message'
     for payload in message.get_payload():
-        # payload should be an email.message.Message instnace
+        # payload should be an email.message.Message instance
         if payload.get_content_type() == content_type:
             logger.info('filename: %s', payload.get_filename())
             _, tempfile_path = tempfile.mkstemp()

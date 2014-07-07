@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+if [[ ${1---help} == '--help' ]]
+then
+  echo "The first argument should be the name of a PostgreSQL database."
+  echo "Writes to a .sql.bz2 file in the current directory"
+  echo
+  echo "  Example: pg_backup notes"
+  exit 1
+fi
+
+DATABASE=$1
+
+FILENAME=$DATABASE-`date +%Y-%m-%d`.sql.bz2
+
+echo "Dumping PostgreSQL database '$DATABASE' to '$FILENAME'"
+
+pg_dump $DATABASE | bzip2 > $FILENAME

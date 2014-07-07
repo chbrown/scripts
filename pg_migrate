@@ -16,16 +16,37 @@ def split(string):
     raise Exception('Cannot infer host and database from %r' % string)
 
 
+def dropdb(host, db, verbose):
+    if host == 'localhost':
+        shell('dropdb %s' % db, verbose)
+    else:
+        shell('ssh -C %s "dropdb %s"' % (host, db), verbose)
+
+
+def createdb(host, db, verbose):
+    if host == 'localhost':
+        shell('createdb %s' % db, verbose)
+    else:
+        shell('ssh -C %s "createdb %s"' % (host, db), verbose)
+
+
 def main():
     parser = argparse.ArgumentParser(description='PostgreSQL migration development tool',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('source', help='SOURCE:DATABASE')
     parser.add_argument('destination', help='DESTINATION:DATABASE')
+    parser.add_argument('-c', '--create', action='store_true', help='create database on destination')
+    parser.add_argument('-d', '--drop', action='store_true', help='drop database on destination')
     parser.add_argument('-v', '--verbose', action='store_true', help='print extra output')
     opts = parser.parse_args()
 
     source_host, source_db = split(opts.source)
     destination_host, destination_db = split(opts.destination)
+
+    if opts.drop:
+        dropdb(destination_host, destination_db, opts.verbose)
+    if opts.create:
+        createdb(destination_host, destination_db, opts.verbose)
 
     if source_host == 'localhost' and destination_host == 'localhost':
         command = 'pg_dump %s | psql %s' % (source_db, destination_db)

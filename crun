@@ -12,7 +12,7 @@ def shell(args):
 
 def crun(compiler, filename, args, flags):
     compile_args = [compiler] + flags.split() + [filename]
-    run_args = ['a.out'] + args
+    run_args = ['./a.out'] + args
 
     compiler_returncode = shell(compile_args)
     if compiler_returncode != 0:

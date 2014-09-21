@@ -6,12 +6,7 @@ from datetime import datetime, date
 # requirements: PyYAML
 
 import yaml
-try:
-    from yaml import CLoader as Loader
-    # from yaml import CDumper as CDumper
-except ImportError:
-    from yaml import Loader
-    # from yaml import Dumper
+from yaml import Loader
 
 
 class JSONEncoder(json.JSONEncoder):

@@ -1,0 +1,56 @@
+#!/usr/bin/env node
+/*jslint node: true */
+var fs = require('fs');
+var logger = require('loge');
+var sqlcmd = require('sqlcmd');
+var Insert = require('sqlcmd/commands/insert').Insert;
+var yaml = require('js-yaml');
+
+var optimist = require('optimist')
+  .usage([
+    'Usage: yaml_to_sql data.yaml',
+    '',
+    'Convert a yaml file to SQL INSERT statements',
+    '',
+    'This is handy if you have a yaml file with table names as keys, where',
+    "each table's value is a list of objects, where those objects are rows",
+    'to be inserted into that table. This lets you run something like:',
+    '    yaml_to_sql data.yaml | psql my_database',
+  ].join('\n'))
+  .describe({
+    help: 'print this help message',
+    verbose: 'print more output',
+  })
+  .boolean(['help', 'verbose'])
+  .alias({verbose: 'v'});
+
+var argv = optimist.argv;
+logger.level = argv.verbose ? 'debug' : 'info';
+
+var convert = function(yaml_filepath, callback) {
+  fs.readFile(yaml_filepath, {encoding: 'utf8'}, function(err, text) {
+    if (err) return callback(err);
+
+    var data = yaml.load(text);
+    var tables = Object.keys(data);
+    tables.forEach(function(table) {
+      console.log('-- TABLE: %s', table);
+
+      var rows = data[table];
+      rows.forEach(function(row) {
+        var sql = new Insert(table).set(row).toUnsafeSQL().replace(/\s+RETURNING \*/, ';');
+
+        console.log(sql);
+      });
+    });
+  });
+};
+
+if (argv.help) {
+  optimist.showHelp();
+}
+else {
+  convert(argv._[0], function(err) {
+    if (err) throw err;
+  });
+}

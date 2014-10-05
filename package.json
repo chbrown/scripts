@@ -12,8 +12,11 @@
   "license": "MIT",
   "dependencies": {
     "async": "*",
+    "loge": "*",
     "marked": "*",
+    "js-yaml": "*",
     "optimist": "*",
+    "sqlcmd": "*",
     "streaming": "*"
   },
   "private": true

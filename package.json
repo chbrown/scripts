@@ -12,9 +12,9 @@
   "license": "MIT",
   "dependencies": {
     "async": "*",
+    "js-yaml": "*",
     "loge": "*",
     "marked": "*",
-    "js-yaml": "*",
     "optimist": "*",
     "sqlcmd": "*",
     "streaming": "*"

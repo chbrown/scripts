@@ -4,18 +4,19 @@ var fs = require('fs');
 var logger = require('loge');
 var sqlcmd = require('sqlcmd');
 var Insert = require('sqlcmd/commands/insert').Insert;
+var streaming = require('streaming');
 var yaml = require('js-yaml');
 
 var optimist = require('optimist')
   .usage([
-    'Usage: yaml_to_sql data.yaml',
+    'Usage: yaml2sql < tabular_data.yaml',
     '',
     'Convert a yaml file to SQL INSERT statements',
     '',
     'This is handy if you have a yaml file with table names as keys, where',
     "each table's value is a list of objects, where those objects are rows",
     'to be inserted into that table. This lets you run something like:',
-    '    yaml_to_sql data.yaml | psql my_database',
+    '    <my_data.yaml yaml2sql | psql my_database',
   ].join('\n'))
   .describe({
     help: 'print this help message',
@@ -27,10 +28,9 @@ var optimist = require('optimist')
 var argv = optimist.argv;
 logger.level = argv.verbose ? 'debug' : 'info';
 
-var convert = function(yaml_filepath, callback) {
-  fs.readFile(yaml_filepath, {encoding: 'utf8'}, function(err, text) {
-    if (err) return callback(err);
-
+var convert = function(stream, callback) {
+  streaming.readToEnd(stream, function(err, chunks) {
+    var text = Buffer.concat(chunks);
     var data = yaml.load(text);
     var tables = Object.keys(data);
     tables.forEach(function(table) {
@@ -49,8 +49,11 @@ var convert = function(yaml_filepath, callback) {
 if (argv.help) {
   optimist.showHelp();
 }
+else if (process.stdin.isTTY) {
+  throw new Error('YAML must be piped in on STDIN');
+}
 else {
-  convert(argv._[0], function(err) {
+  convert(process.stdin, function(err) {
     if (err) throw err;
   });
 }

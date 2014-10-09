@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+INPUT="$1"
+OUTPUT="${INPUT/\.pdf/}.gs.pdf"
+gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile="$OUTPUT" -f "$INPUT"
+echo Output written to $OUTPUT

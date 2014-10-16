@@ -612,28 +612,6 @@ Useful because Node.js's YAML support used to suck.
 
     cat simple_spec.yaml | yaml2json > simple_spec.json
 
-# yaml2sql
-
-Convert a yaml file to SQL INSERT statements.
-
-This is handy if you have a yaml file with table names as keys, where each table's value is a list of objects, where those objects are rows to be inserted into that table.
-
-    yaml2sql < my_data.yaml | psql my_database
-
-`my_data.yaml`, e.g.:
-
-    ---
-    templates:
-      - name: simple_header
-        html: <div><h1>Heading: {{html}}<h1></div>
-      - name: simple_paragraph
-        html: <p>{{html}}<p>
-
-    annotators:
-      - name: Chris Brown
-      - name: Gold Standard
-      - name: Guest
-
 # zipf
 
 Print out the most common words in a plain text document.

@@ -16,7 +16,6 @@
     "loge": "*",
     "marked": "*",
     "optimist": "*",
-    "sqlcmd": "*",
     "streaming": "*"
   },
   "private": true

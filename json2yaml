@@ -1,0 +1,41 @@
+#!/usr/bin/env node
+/*jslint node: true */
+var fs = require('fs');
+var streaming = require('streaming');
+var js_yaml = require('js-yaml');
+
+var optimist = require('optimist')
+  .usage([
+    'Usage: json2yaml < data.json',
+    '',
+    'Convert a JSON file to YAML',
+  ].join('\n'))
+  .describe({
+    help: 'print this help message',
+  })
+  .boolean(['help'])
+  .alias({help: 'h'});
+
+var argv = optimist.argv;
+
+var convert = function(stream, callback) {
+  streaming.readToEnd(stream, function(err, chunks) {
+    var json = Buffer.concat(chunks);
+    var obj = JSON.parse(json);
+    var yaml = js_yaml.dump(obj);
+    console.log(yaml);
+    callback();
+  });
+};
+
+if (argv.help) {
+  optimist.showHelp();
+}
+else if (process.stdin.isTTY) {
+  throw new Error('JSON must be piped in on STDIN');
+}
+else {
+  convert(process.stdin, function(err) {
+    if (err) throw err;
+  });
+}

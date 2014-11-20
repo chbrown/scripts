@@ -215,6 +215,18 @@ Running `cat email.json | jinja email.jinja.md` produces the following:
     Body:
     > Hey lemme know if you got this...
 
+# json2yaml
+
+YAML is a superset of JSON, so there are lots of ways to convert JSON to YAML. I say, one is better than none.
+
+    json2yaml < package.json
+    > name: scripts
+    > version: 0.2.0
+    > description: Handy scripts
+    > keywords:
+    >   - scripts
+    > ...
+
 # launch
 
 Simply grep for a Mac LaunchAgent that matches the given argument, and start it. Easy way to have databases around but not always use them when not developing.

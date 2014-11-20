@@ -215,6 +215,19 @@ Running `cat email.json | jinja email.jinja.md` produces the following:
     Body:
     > Hey lemme know if you got this...
 
+# jsmap
+
+When [`jq`](http://stedolan.github.io/jq/) isn't enough (it usually is), this is like `perl -e` but for `node` (and JSON).
+
+Input newline-separated JSON on `stdin`.
+The first command line argument is the program code.
+The input object is available as `obj`.
+The transformation should be `return`'d,
+  which will be `JSON.stringify`'d
+  and sent to `stdout` (as newline-separated JSON).
+
+- `jsmap 'return {id: obj[\"id\"]}'` == `jq {id: .id}`
+
 # json2yaml
 
 YAML is a superset of JSON, so there are lots of ways to convert JSON to YAML. I say, one is better than none.

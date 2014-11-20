@@ -1,0 +1,96 @@
+#!/usr/bin/env node
+/*jslint node: true */
+var vm = require('vm');
+var stream = require('stream');
+var util = require('util');
+
+var streaming = require('streaming');
+
+var optimist = require('optimist')
+  .usage([
+    "Usage: jsmap 'return {id: obj[\"id\"]}' < input.json > output.json",
+    '',
+    'Transform newline-separated JSON objects with JavaScript.',
+    '',
+    'Runs the code in the first command line argument for each line of input.',
+    '* the object parsed from the JSON on stdin will be available as `obj`',
+    '* return `undefined` to discard the current input',
+    "* all other returned values will be JSON.stringify'd and sent to stdout",
+    '',
+    "Uses Node.js' vm functionality to sandbox the code.",
+  ].join('\n'))
+  .describe({
+    help: 'print this help message',
+    verbose: 'print more output',
+  })
+  .boolean(['help', 'verbose'])
+  .alias({help: 'h', verbose: 'v'});
+
+var argv = optimist.argv;
+
+var JSONNull = {
+  toJSON: function() {
+    return null;
+  }
+};
+
+var JavascriptTransform = module.exports = function(code, context) {
+  stream.Transform.call(this, {objectMode: true});
+  this.code = code;
+  this.context = context;
+};
+util.inherits(JavascriptTransform, stream.Transform);
+JavascriptTransform.prototype._transform = function(chunk, encoding, callback) {
+  this.context.obj = chunk;
+  try {
+    vm.runInContext(this.code, this.context);
+  }
+  catch (err) {
+    this.emit('error', err);
+  }
+  if (context.__res === null) {
+    // we have to push a wrapper around JSON null, because `push(null)` means EOF.
+    // It's kind of a hack; we could maybe wrap JSON.stringify into this transform
+    // instead of using new streaming.json.Stringifier() in the pipeline
+    this.push(JSONNull);
+  }
+  else if (this.context.__res !== undefined) {
+    this.push(this.context.__res);
+  }
+  callback();
+};
+
+if (argv.help) {
+  optimist.showHelp();
+}
+else if (process.stdin.isTTY) {
+  throw new Error('JSON must be piped in on STDIN');
+}
+else {
+  argv = optimist.check(function(argv) {
+    if (argv._.length < 1) {
+      throw new Error('You must specify an eval string');
+    }
+    else if (argv._.length > 1) {
+      throw new Error('You must specify only one eval string');
+    }
+  }).argv;
+
+  var code = argv._[0].replace(/return /, '__res = ');
+  var context = vm.createContext();
+
+  process.stdin
+  .pipe(new streaming.json.Parser())
+  .on('error', function(err) {
+    console.error('Failed to parse JSON input: %s', err);
+  })
+  .pipe(new JavascriptTransform(code, context))
+  .on('error', function(err) {
+    console.error('Failed to execute transform code: %s', err);
+  })
+  .pipe(new streaming.json.Stringifier())
+  .on('error', function(err) {
+    console.error('Failed to stringify output: %s', err);
+  })
+  .pipe(process.stdout);
+}

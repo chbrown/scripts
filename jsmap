@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 /*jslint node: true */
-var fs = require('fs');
 var stream = require('stream');
 var util = require('util');
 
@@ -8,19 +7,21 @@ var streaming = require('streaming');
 
 var optimist = require('optimist')
   .usage([
-    "Usage: jsmap 'return {id: obj[\"id\"]}' < input.json > output.json",
+    "Usage: jsmap '$out = {id: $in.id}' <input.json >output.json",
     '',
     'Transform newline-separated JSON objects with JavaScript.',
     '',
     'Runs the code in the first command line argument for each line of input.',
-    '* the object parsed from the JSON on stdin will be available as `obj`',
-    '* return `undefined` to discard the current input',
-    "* all other returned values will be JSON.stringify'd and sent to stdout",
+    '* the object parsed from the JSON on stdin will be available as `$in`',
+    '* $out defaults to `undefined`, which discards the current input',
+    "* all other values of $out will be JSON.stringify'd and sent to stdout",
     '',
     "This script uses Node.js'/V8's vm functionality to sandbox the code.",
+    '',
+    'If you want to skip the vm and run code from a file, use jsed:',
+    '  npm install -g jsed; jsed --help',
   ].join('\n'))
   .describe({
-    file: 'read javascript from file instead of command line argument',
     init: 'code to run once',
     help: 'print this help message',
     verbose: 'print more output',
@@ -30,7 +31,7 @@ var optimist = require('optimist')
     'verbose',
   ])
   .alias({
-    file: 'f',
+    init: 'i',
     help: 'h',
     verbose: 'v',
   });
@@ -45,20 +46,13 @@ else if (process.stdin.isTTY) {
 }
 else {
   argv = optimist.check(function(argv) {
-    if (argv._.length > 0 && argv.file !== undefined) {
-      throw new Error('You must not specify both an eval string and a file');
+    if (argv._.length < 1) {
+      throw new Error('You must specify an eval string');
     }
     if (argv._.length > 1) {
       throw new Error('You must not specify more than one eval string');
     }
-    if (argv._.length === 0 && argv.file === undefined) {
-      throw new Error('You must specify code to evaluate on each input item, via --file / -f, or a command line argument.');
-    }
   }).argv;
-
-  process.stdin.on('error', function(err) {
-    console.error('STDIN error: %s', err);
-  });
 
   // 1. parser
   var parser = new streaming.json.Parser().on('error', function(err) {
@@ -66,7 +60,7 @@ else {
   });
 
   // 2. transform
-  var code = argv._[0] || fs.readFileSync(argv.file, {encoding: 'utf-8'});
+  var code = argv._[0];
   var vm_stream = new streaming.VM(code, {}).on('error', function(err) {
     console.error('Failed to execute transform code: %s', err);
   });

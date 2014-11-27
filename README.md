@@ -219,14 +219,22 @@ Running `cat email.json | jinja email.jinja.md` produces the following:
 
 When [`jq`](http://stedolan.github.io/jq/) isn't enough (it usually is), this is like `perl -e` but for `node` (and JSON).
 
-Input newline-separated JSON on `stdin`.
-The first command line argument is the program code.
-The input object is available as `obj`.
-The transformation should be `return`'d,
-  which will be `JSON.stringify`'d
-  and sent to `stdout` (as newline-separated JSON).
+1. Input newline-separated JSON on `stdin`.
+2. The first command line argument is the program code.
+3. The input object is available as `$in`.
+4. The transformation should set as `$out`,
+5. ...which will be `JSON.stringify`'d
+6. ...and sent to `stdout` (as newline-separated JSON).
 
-- `jsmap 'return {id: obj[\"id\"]}'` == `jq {id: .id}`
+For example:
+
+    jsmap '$out = {id: $in.id}'
+
+Is equivalent to:
+
+    jq '{id: .id}'
+
+If you want to run a stream of JSON through a file without having to handle the JSON conversion on each side, try [jsed](https://github.com/chbrown/jsed), which was spun out of this script.
 
 # json2yaml
 

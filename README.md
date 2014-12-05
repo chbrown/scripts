@@ -640,10 +640,9 @@ whois-domains ~/domains.yaml
 
 # yaml2json
 
-Using Python's yaml and json modules, read in yaml and output json.
-Useful because Node.js's YAML support used to suck.
+Read in YAML and output JSON.
 
-    cat simple_spec.yaml | yaml2json > simple_spec.json
+    cat simple_spec.yaml | yaml2json | jq . > simple_spec.json
 
 # zipf
 

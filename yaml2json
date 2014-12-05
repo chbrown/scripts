@@ -1,41 +1,32 @@
-#!/usr/bin/env python
-import sys
-import json
-from datetime import datetime, date
+#!/usr/bin/env node
+/*jslint node: true */
+var fs = require('fs');
+var streaming = require('streaming');
+var js_yaml = require('js-yaml');
 
-# requirements: PyYAML
+var optimist = require('optimist')
+  .usage([
+    'Usage: yaml2json < data.yaml',
+    '',
+    'Convert YAML file to JSON',
+  ].join('\n'))
+  .describe({help: 'print this help message'})
+  .boolean('help');
 
-import yaml
-from yaml import Loader
+var argv = optimist.argv;
 
-
-class JSONEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, datetime):
-            return obj.strftime('%Y-%m-%dT%H:%M:%S')
-        if isinstance(obj, date):
-            return obj.strftime('%Y-%m-%d')
-        return json.JSONEncoder.default(self, obj)
-
-
-def yaml2json(fd_in, fd_out, indent=None):
-    document = yaml.load(fd_in, Loader=Loader)
-    json.dump(document, fd_out, cls=JSONEncoder, indent=indent)
-    fd_out.write('\n')
-
-
-def main():
-    import argparse
-    parser = argparse.ArgumentParser(description='Convert YAML to JSON',
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('input', nargs='?', type=argparse.FileType('r'), default=sys.stdin,
-        help='YAML path (defaults to STDIN)')
-    parser.add_argument('output', nargs='?', type=argparse.FileType('w'), default=sys.stdout,
-        help='JSON path (defaults to STDOUT)')
-    parser.add_argument('--indent', action='store_true', help='Indent')
-    opts = parser.parse_args()
-
-    yaml2json(opts.input, opts.output, 2 if opts.indent else None)
-
-if __name__ == '__main__':
-    main()
+if (argv.help) {
+  optimist.showHelp();
+}
+else if (process.stdin.isTTY) {
+  throw new Error('YAML must be piped in on STDIN');
+}
+else {
+  streaming.readToEnd(process.stdin, function(err, chunks) {
+    if (err) throw err;
+    var yaml = Buffer.concat(chunks);
+    var obj = js_yaml.safeLoad(yaml);
+    var json = JSON.stringify(obj);
+    console.log(json);
+  });
+}

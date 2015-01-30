@@ -292,13 +292,20 @@ Reset your current MAC address to a random new one:
 
     sudo mac.py
 
-# md
 
-marked + standard header + open
+## `md` (node.js)
 
-    md somedoc.md
+Convert Markdown to HTML and prefix with a global header.
 
-Create `somedoc.html` by rendering the markdown in `somedoc.md` and prepending with (by default) `~/.standardhead.html`. Then run `open` to view the html in your default browser.
+    md README.md README.html
+
+Or you can pipe Markdown into `md`. The example below dumps the HTML to a temporary file and opens it in Firefox.
+
+    pbpaste | md > /tmp/pasteboard.html
+    open -a Firefox.app /tmp/pasteboard.html
+
+The header filepath defaults to `~/.standardhead.html`.
+
 
 # md5py
 

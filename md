@@ -1,53 +1,96 @@
 #!/usr/bin/env node
 /*jslint node: true */
 var fs = require('fs');
+var path = require('path');
 var marked = require('marked');
+var streaming = require('streaming');
 var child_process = require('child_process');
-
-// marked.setOptions({});
 
 var optimist = require('optimist')
   .usage([
-    'Usage: md doc.md',
+    'Usage: md README.md README.html',
+    '       md <README.md >README.html',
     '',
-    'This will render the specified Markdown file to html, simply swapping the extension, e.g., "doc.html"',
-    'Alternatively, it can look for the first *.md in the current directory, and render that.',
+    'Render Markdown to html, prefixing it with an HTML header.',
+    '',
+    'If the first argument is specified and is not "-", md reads input from',
+    'that path. Otherwise, md reads from stdin.',
+    'If the second argument is specified and is not "-", md writes output to',
+    'that path. Otherwise, md writes to stdout.',
+    'The contents of ~/.standardhead.html, if it exists, will be prepended to',
+    'the HTML output.'
   ].join('\n'))
   .describe({
-    input: 'Markdown input',
-    output: 'HTML output',
     head: 'Header HTML',
     help: 'print this help message',
   })
   .boolean(['help'])
   .default({
-    // input: '*.md',
-    head: '~/.standardhead.html',
+    head: path.join(process.env.HOME, '.standardhead.html'),
   });
 
-var argv = optimist.argv;
+function render(input_stream, output_stream, callback) {
+  streaming.readToEnd(input_stream, function(err, chunks) {
+    if (err) return callback(err);
 
-var md_extension = function(file) { return file.match(/.md$/); };
+    var input_markdown = Buffer.concat(chunks).toString('utf8');
+    marked(input_markdown, {}, function(err, input_html) {
+      if (err) return callback(err);
 
-if (argv.help) {
-  optimist.showHelp();
-}
-else {
-  var input_filepath = argv._[0] || argv.input || fs.readdirSync('.').filter(md_extension)[0];
-  var input_markdown = fs.readFileSync(input_filepath, {encoding: 'utf8'});
-  marked(input_markdown, {}, function(err, input_html) {
-    if (err) throw err;
-
-    var head_filepath = argv.head.replace(/^~/, process.env.HOME);
-    var head_html = fs.readFileSync(head_filepath, {encoding: 'utf8'});
-
-    var output_filepath = input_filepath.replace(/md$/, 'html');
-    fs.writeFileSync(output_filepath, head_html + input_html, {encoding: 'utf8'});
-    console.log('Wrote html to %s', output_filepath);
-
-    child_process.exec('open ' + output_filepath, function(err, stdout, stderr) {
-      if (err) throw err;
-      console.log('Opened %s', output_filepath);
+      var head_stream = fs.createReadStream(argv.head);
+      head_stream.pipe(output_stream, {end: false});
+      head_stream.on('end', function() {
+        output_stream.write(input_html);
+        callback();
+      });
     });
   });
+}
+
+if (require.main == module) {
+  var argv = optimist.argv;
+
+  if (argv.help) {
+    optimist.showHelp();
+    process.exit(0);
+  }
+
+  var arg_in = argv._[0];
+  var arg_out = argv._[1];
+
+  var done = function(err) {
+    if (err) throw err;
+  };
+
+  var input_stream = null;
+  var output_stream = null;
+  if (!process.stdin.isTTY || arg_in == '-') {
+    input_stream = process.stdin;
+  }
+  else if (arg_in) {
+    var input_filepath = arg_in;
+    input_stream = fs.createReadStream(input_filepath);
+  }
+  else {
+    throw new Error('You must specify some Markdown input');
+  }
+
+  if (arg_out && arg_out != '-') {
+    var output_filepath = arg_out;
+    output_stream = fs.createWriteStream(output_filepath);
+
+    done = function(err) {
+      if (err) throw err;
+      child_process.exec('open ' + output_filepath, function(err, stdout, stderr) {
+        if (err) throw err;
+        output_stream.end();
+        console.log('opened %s', output_filepath);
+      });
+    };
+  }
+  else {
+    output_stream = process.stdout;
+  }
+
+  render(input_stream, output_stream, done);
 }

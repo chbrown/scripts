@@ -10,7 +10,7 @@ if [[ ${1---help} == '--help' ]]; then
 fi
 
 DATABASE=$1
-FILENAME=$DATABASE-$(date +%Y-%m-%dT%H-%M-%S).sql.bz2
+FILENAME=$DATABASE-$(date +%Y%m%dT%H%M%S).sql.bz2
 
 echo "Dumping PostgreSQL database '$DATABASE' to '$FILENAME'"
 

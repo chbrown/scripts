@@ -387,25 +387,25 @@ Watermark only the first page of a PDF with another PDF.
     pdfstamp Chomsky_2012.pdf fair_use.pdf
 
 
-# `pg_backup` (bash)
+## `pg_backup` (bash)
 
-Pipes `pg_dump` though `bzip2` and saves a timestamped file in the current directory.
+Pipes `pg_dump` though `bzip2` and saves an ISO 8601-timestamped (`YYYYMMDDThhmmss`) file in the current directory.
 
     pg_backup flickr
 
 Outputs:
 
-    Dumping PostgreSQL database 'flickr' to 'flickr-2015-01-30T14-45-32.sql.bz2'
+    Dumping PostgreSQL database 'flickr' to 'flickr-20150130T153636.sql.bz2'
 
 
-# `pg_migrate` (python)
+## `pg_migrate` (python)
 
 Copy a complete PostgreSQL database from one host to another (or to the same host under a different database name).
 Supports remote hosts via ssh.
 
     pg_migrate -cd dark:twitter_dev localhost:twitter_dev
 
-Uses python to construct a `ssh -C` and `pg_dump` pipeline.
+Uses python to construct a `ssh -C` and `pg_dump` pipeline. Options:
 
 * `-d` / `--drop` runs `dropdb` on the target host as needed.
 * `-c` / `--create` runs `createdb` on the target host.

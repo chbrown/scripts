@@ -386,13 +386,30 @@ Watermark only the first page of a PDF with another PDF.
 
     pdfstamp Chomsky_2012.pdf fair_use.pdf
 
-# pg_migrate
 
-Like mongomigrate, but shorter (and not ruby)!
+# `pg_backup` (bash)
 
-    pg_migrate dark:twitter_dev localhost:twitter_dev
+Pipes `pg_dump` though `bzip2` and saves a timestamped file in the current directory.
 
-Uses `ssh -C` and `pg_dump` but that's about it. You'll need to `dropdb` and `createdb`, etc., yourself.
+    pg_backup flickr
+
+Outputs:
+
+    Dumping PostgreSQL database 'flickr' to 'flickr-2015-01-30T14-45-32.sql.bz2'
+
+
+# `pg_migrate` (python)
+
+Copy a complete PostgreSQL database from one host to another (or to the same host under a different database name).
+Supports remote hosts via ssh.
+
+    pg_migrate -cd dark:twitter_dev localhost:twitter_dev
+
+Uses python to construct a `ssh -C` and `pg_dump` pipeline.
+
+* `-d` / `--drop` runs `dropdb` on the target host as needed.
+* `-c` / `--create` runs `createdb` on the target host.
+
 
 # ppjson
 

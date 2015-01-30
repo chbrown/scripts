@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-if [[ ${1---help} == '--help' ]]
-then
+if [[ ${1---help} == '--help' ]]; then
+  # this defaults a missing first argument to --help, so it works for both cases.
   echo "The first argument should be the name of a PostgreSQL database."
   echo "Writes to a .sql.bz2 file in the current directory"
   echo
@@ -10,9 +10,13 @@ then
 fi
 
 DATABASE=$1
-
-FILENAME=$DATABASE-`date +%Y-%m-%d`.sql.bz2
+FILENAME=$DATABASE-$(date +%Y-%m-%dT%H-%M-%S).sql.bz2
 
 echo "Dumping PostgreSQL database '$DATABASE' to '$FILENAME'"
 
-pg_dump $DATABASE | bzip2 > $FILENAME
+pg_dump "$DATABASE" | bzip2 > "$FILENAME"
+
+if [[ ${PIPESTATUS[0]} != 0 ]]; then
+  echo "Removing '$FILENAME' due to 'pg_dump' error"
+  rm "$FILENAME"
+fi

@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+lsof -p $$ | grep -v REG

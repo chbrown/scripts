@@ -394,6 +394,13 @@ Watermark only the first page of a PDF with another PDF.
     pdfstamp Chomsky_2012.pdf fair_use.pdf
 
 
+## `pof` (bash)
+
+Lists all file descriptors open by the current shell, excluding regular files.
+
+Simply runs: `lsof -p $$ | grep -v REG`
+
+
 ## `pg_backup` (bash)
 
 Pipes `pg_dump` though `bzip2` and saves an ISO 8601-timestamped (`YYYYMMDDThhmmss`) file in the current directory.

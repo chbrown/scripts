@@ -543,6 +543,13 @@ This can be destructive since it recurses over all files, including binaries; it
 
     style --fix ~/github/**/*.py
 
+# tabs2spaces
+
+Replace tabs with character padding sufficient to fit all values in a given column. Reads entire stdin before outputting anything in order to measure the width of each column.
+
+    tabs2spaces < accounts.tsv
+
+
 # tabulate
 
 Like `sort | uniq -c | sort -g`, but with nice formatting. E.g.,

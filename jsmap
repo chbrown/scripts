@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/*jslint node: true */
 var stream = require('stream');
 var util = require('util');
 

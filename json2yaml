@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/*jslint node: true */
 var fs = require('fs');
 var streaming = require('streaming');
 var js_yaml = require('js-yaml');

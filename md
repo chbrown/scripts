@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/*jslint node: true */
 var fs = require('fs');
 var path = require('path');
 var marked = require('marked');

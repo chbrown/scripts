@@ -1,5 +1,4 @@
 #!/usr/bin/env phantomjs
-'use strict'; /*jslint es5: true, node: true, indent: 2 */
 var system = require('system');
 var webpage = require('webpage');
 var fs = require('fs');

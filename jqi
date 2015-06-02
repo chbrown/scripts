@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# the final command line argument will be the file we overwrite
+FILE=${@: -1}
+if [[ ! -e "$FILE" ]]; then
+  echo 'The final argument must be an existing file'
+  exit 1
+fi
+# run the command
+TMPFILE=$(mktemp -t "$(basename $FILE)")
+>&2 echo "writing output to temporary file: $TMPFILE"
+jq $@ > "${TMPFILE}"
+jq_status=$?
+if [[ $jq_status -ne 0 ]]; then
+  echo "jq command failed"
+  exit $jq_status
+fi
+# backup the original file
+BAKFILE=$(mktemp -u -t "$(basename $FILE).bak")
+>&2 echo "backing up original file: $BAKFILE"
+link "$FILE" "$BAKFILE"
+unlink "$FILE"
+mv "$TMPFILE" "$FILE"

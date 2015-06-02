@@ -215,6 +215,20 @@ Running `cat email.json | jinja email.jinja.md` produces the following:
     Body:
     > Hey lemme know if you got this...
 
+# jqi
+
+`jqi` is `jq` `i`n-place.
+
+Call [`jq`](http://stedolan.github.io/jq/) and overwrite the input with the output.
+
+For example, to pretty-print a JSON file in-place:
+
+    jqi . search-result.json
+
+It uses the last command line argument as the file that it will overwrite, so it only really makes sense to have one input file.
+
+It prints the temporary and backup filepaths it uses to `stderr`.
+
 # jsmap
 
 When [`jq`](http://stedolan.github.io/jq/) isn't enough (it usually is), this is like `perl -e` but for `node` (and JSON).

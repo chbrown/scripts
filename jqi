@@ -5,18 +5,20 @@ if [[ ! -e "$FILE" ]]; then
   echo 'The final argument must be an existing file'
   exit 1
 fi
+# prepare the temporary output file
+TMP_DIRPATH=$(mktemp -d -t jqi.XXXXXXXX)
+TMP_FILEPATH=$TMP_DIRPATH/$(basename $FILE)
+>&2 echo "writing output to temporary file: $TMP_FILEPATH"
 # run the command
-TMPFILE=$(mktemp -t "$(basename $FILE)")
->&2 echo "writing output to temporary file: $TMPFILE"
-jq $@ > "${TMPFILE}"
+jq $@ > "${TMP_FILEPATH}"
 jq_status=$?
 if [[ $jq_status -ne 0 ]]; then
   echo "jq command failed"
   exit $jq_status
 fi
 # backup the original file
-BAKFILE=$(mktemp -u -t "$(basename $FILE).bak")
->&2 echo "backing up original file: $BAKFILE"
-link "$FILE" "$BAKFILE"
+BAK_FILEPATH=${TMP_FILEPATH}.bak
+>&2 echo "backing up original file: $BAK_FILEPATH"
+link "$FILE" "$BAK_FILEPATH"
 unlink "$FILE"
-mv "$TMPFILE" "$FILE"
+mv "$TMP_FILEPATH" "$FILE"

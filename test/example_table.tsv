@@ -1,0 +1,6 @@
+Tag	General_Category	Note
+reserved	Cn	Noncharacter_Code_Point=F
+noncharacter	Cn	Noncharacter_Code_Point=T
+control	Cc	
+private-use	Co	
+surrogate	Cs	

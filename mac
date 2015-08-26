@@ -1,65 +1,62 @@
 #!/usr/bin/env python
-# import sys
 import re
 import os
 import random
 import argparse
 
+# helper functions
 
-class MacAddress(object):
-    def __init__(self, value):
-        self.value = value
+def read_current_mac_address():
+    '''
+    Issues a system call to ifconfig and returns a list of bytes representing
+    the MAC address.
+    '''
+    en0 = os.popen('ifconfig en0').read()
+    match = re.search('ether ([A-Za-z0-9:]+)', en0)
+    hex_pairs = match.group(1).split(':')
+    return [int(hex_pair, 16) for hex_pair in hex_pairs]
 
-    def __str__(self):
-        hex_value = '%x' % self.value
-        # this little iter(...)*2 is cleverer than I, see
-        # http://stackoverflow.com/questions/1624883/alternative-way-to-split-a-list-into-groups-of-n
-        hex_pairs = zip(*(iter(hex_value),)*2)
-        return ':'.join(map(''.join, hex_pairs))
+def format_mac_address(octets, sep=':'):
+    '''
+    Take a byte-array representation of a MAC address and return a hex-encoded
+    char-separated string like 82:0e:5a:90:9b:d4
+    '''
+    return sep.join(['%02x' % octet for octet in octets])
 
-    @classmethod
-    def random(cls):
-        # first octet/number must be even, apparently
-        # any 48-bit number, i.e., a number between 0 and 2^48
-        # octets = [random.randint(0, 127) * 2] + [random.randint(0, 255) for _ in range(5)]
-        # octets << 8
-        # return format_mac(':'.join(['%0x' % octet for octet in octets])
-        return cls(random.randint(0, 1 << 48))
+def generate_random_mac_address():
+    # first octet/number must be even, apparently
+    # any 48-bit number, i.e., a number between 0 and 2^48
+    return [random.randint(0, 127) * 2] + [random.randint(0, 255) for _ in range(5)]
 
-    @classmethod
-    def current(cls):
-        en0 = os.popen('ifconfig en0').read()
-        match = re.search('ether ([A-Za-z0-9:]+)', en0)
-        hex_value = match.group(1)
-
-        return cls(int(hex_value.replace(':', ''), 16))
-
-
-# actions:
-
+# commands
 
 def generate(opts):
     '''Print a random valid MAC address to STDOUT'''
-    print MacAddress.random()
-
+    print format_mac_address(generate_random_mac_address())
 
 def reset(opts):
-    '''Reset the current en0 ether address. You must sudo / run this as root.'''
-    previous = MacAddress.current()
-
-    random_mac_address = MacAddress.random()
+    '''
+    Reset the current en0 ether address. You must sudo / run this as root.
+    '''
+    original_mac_address = read_current_mac_address()
+    random_mac_address = generate_random_mac_address()
     # disassociate your wi-fi connection:
     os.system('airport -z')
     # set to the new address:
-    os.system('ifconfig en0 ether "%s"' % random_mac_address)
-    result = MacAddress.current()
-    print '%s -> %s' % (previous, result)
-
+    os.system('ifconfig en0 ether "%s"' % format_mac_address(random_mac_address))
+    # check if it took
+    result_mac_address = read_current_mac_address()
+    if result_mac_address == random_mac_address:
+        print '%s -> %s (success)' % (format_mac_address(original_mac_address), format_mac_address(result_mac_address))
+    else:
+        print '%s ! %s (failure)' % (format_mac_address(original_mac_address), format_mac_address(random_mac_address))
+        raise SystemExit(1)
 
 def info(opts):
     '''Print the current MAC address'''
-    print MacAddress.current()
+    print format_mac_address(read_current_mac_address())
 
+# cli
 
 def main():
     actions = dict(generate=generate, reset=reset, info=info)

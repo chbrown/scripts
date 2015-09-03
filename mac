@@ -4,7 +4,19 @@ import os
 import random
 import argparse
 
+
 # helper functions
+
+def read_hardware_mac_address():
+    '''
+    Once the MAC address has been spoofed, the easiest way to reset it to your
+    original address is to restart your computer. Or use `networksetup` to
+    recover it.
+    '''
+    en0 = os.popen('networksetup -getmacaddress en0').read()
+    match = re.search('([A-Za-z0-9:]{17})', en0)
+    hex_pairs = match.group(1).split(':')
+    return [int(hex_pair, 16) for hex_pair in hex_pairs]
 
 def read_current_mac_address():
     '''
@@ -28,47 +40,58 @@ def generate_random_mac_address():
     # any 48-bit number, i.e., a number between 0 and 2^48
     return [random.randint(0, 127) * 2] + [random.randint(0, 255) for _ in range(5)]
 
-# commands
-
-def generate(opts):
-    '''Print a random valid MAC address to STDOUT'''
-    print format_mac_address(generate_random_mac_address())
-
-def reset(opts):
+def set_mac_address(target_mac_address):
     '''
-    Reset the current en0 ether address. You must sudo / run this as root.
+    Set the current en0 ether address. You must sudo / run this as root.
     '''
     original_mac_address = read_current_mac_address()
-    random_mac_address = generate_random_mac_address()
     # disassociate your wi-fi connection:
     os.system('airport -z')
     # set to the new address:
-    os.system('ifconfig en0 ether "%s"' % format_mac_address(random_mac_address))
+    os.system('ifconfig en0 ether "%s"' % format_mac_address(target_mac_address))
     # check if it took
     result_mac_address = read_current_mac_address()
-    if result_mac_address == random_mac_address:
+    if result_mac_address == target_mac_address:
         print '%s -> %s (success)' % (format_mac_address(original_mac_address), format_mac_address(result_mac_address))
     else:
-        print '%s ! %s (failure)' % (format_mac_address(original_mac_address), format_mac_address(random_mac_address))
+        print '%s ! %s (failure)' % (format_mac_address(original_mac_address), format_mac_address(target_mac_address))
         raise SystemExit(1)
 
-def info(opts):
+
+# commands
+
+def generate():
+    '''Print a random valid MAC address to STDOUT'''
+    print format_mac_address(generate_random_mac_address())
+
+def info():
     '''Print the current MAC address'''
     print format_mac_address(read_current_mac_address())
+
+def randomize():
+    '''Set the current MAC address to a random address'''
+    random_mac_address = generate_random_mac_address()
+    set_mac_address(random_mac_address)
+
+def revert():
+    '''Set the current MAC address to the hardware's original address'''
+    original_mac_address = read_hardware_mac_address()
+    set_mac_address(original_mac_address)
+
 
 # cli
 
 def main():
-    actions = dict(generate=generate, reset=reset, info=info)
+    actions = dict(generate=generate, info=info, randomize=randomize, revert=revert)
     uid = os.geteuid()
-    default_action = 'reset' if uid == 0 else 'info'
+    default_action = 'randomize' if uid == 0 else 'info'
 
     parser = argparse.ArgumentParser(description='Usage: Change MAC address',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('action', choices=actions, nargs='?', help='Action', default=default_action)
 
     opts = parser.parse_args()
-    actions[opts.action](opts)
+    actions[opts.action]()
 
 
 if __name__ == '__main__':

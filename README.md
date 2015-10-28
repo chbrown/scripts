@@ -417,13 +417,17 @@ Simply runs: `lsof -p $$ | grep -v REG`
 
 ## `pg_backup` (bash)
 
-Pipes `pg_dump` though `bzip2` and saves an ISO 8601-timestamped (`YYYYMMDDThhmmss`) file in the current directory.
+Pipes `pg_dump` though `bzip2` and saves an ISO 8601-timestamped file (`YYYYMMDD-<name>.sql.bz2`) in the current directory. If such a file already exists, it will also use the time part of the date (`YYYYMMDDThhmmss-<name>.sql.bz2`).
 
     pg_backup flickr
 
 Outputs:
 
-    Dumping PostgreSQL database 'flickr' to 'flickr-20150130T153636.sql.bz2'
+    Dumping PostgreSQL database 'flickr' to '20150130-flickr.sql.bz2'
+
+Running the same command again will see the file conflict and avoid clobbering the original:
+
+    Dumping PostgreSQL database 'flickr' to '20150130T153636-flickr.sql.bz2'
 
 
 ## `pg_migrate` (python)

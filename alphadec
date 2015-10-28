@@ -18,9 +18,8 @@ populations = dict(
 
 parser = argparse.ArgumentParser(description='Generate random strings',
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('--length', '-l', type=int, help='Length of each password', default=12)
+parser.add_argument('--length', '-l', type=int, help='Length of each password', default=16)
 parser.add_argument('--count', '-c', type=int, help='Number of passwords', default=1)
-
 parser.add_argument('--population', '-p', choices=populations, help='Population to sample from', default='all')
 opts = parser.parse_args()
 

@@ -25,7 +25,6 @@ Except for following files, I am the sole author of all of these scripts.
 * `autoreload`
 * `htpasswd.py`
 * `otf2ttf2eot.sh`
-* `soundcloud`
 * `transpose`
 * `lib/` and everything in this directory.
 
@@ -555,12 +554,6 @@ Little helper for the awesome `sshfs` tool that OS X Fuse provides. It'll make t
 Secure move. Like scp but remove the files after copying.
 
     smv 2013-09-07.json.gz 2013-09-08.json.gz /mnt/backup/days_and_days --delete
-
-# soundcloud
-
-Python rendition of Luka Pusic's soundcloud.sh downloader. His wasn't unescaping higher order Unicode character escapes. Well, the Mac OS X filesystem totally supports UTF-8, and this script does too.
-
-    soundcloud https://soundcloud.com/oskmusic
 
 # statuses
 

@@ -631,6 +631,15 @@ Use like:
 
     tgz penn-treebank-rel3/
 
+# tjz
+
+Run `tar cj` and move the original into `/tmp`:
+
+    $ tjz table_extractor/
+    created table_extractor.tar.bz2 and moved original to /tmp/table_extractor-20160117T135651
+
+It will exit gracefully if the original does not exist, or if the target `$1.tar.bz2` file already exists.
+
 # transpose
 
 Super-complicated Awk script for transposing like in Excel.

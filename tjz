@@ -1,14 +1,27 @@
 #!/usr/bin/env bash
+set -e # exit on first command that fails
 # Use like: tjz penn-treebank-rel3/
 
-# remove trailing slash (hopefully there's only one)
-file="${1%/}"
-[ ! -e "$file" ] && echo "$file" does not exist. && exit 1
+# remove trailing slash (hopefully there's at most one)
+filepath="${1%/}"
+[ ! -e "$filepath" ] && echo "$filepath" does not exist. && exit 1
 
-file_tar_bz2="$file.tar.bz2"
-[ -e "$file_tar_bz2" ] && echo "$file_tar_bz2" already exists, not overwriting. && exit 1
+[ -e "$filepath.tar.bz2" ] && echo "$filepath.tar.bz2" already exists, not overwriting. && exit 1
 
-echo tar -cjf "$file_tar_bz2" "$file"
-tar -cjf "$file_tar_bz2" "$file"
-mv "$file" "$file.tmp"
-echo "$file_tar_bz2" created and original moved to "$file.tmp"
+filename="$(basename "$filepath")"
+
+# prepare to treat the parent directory as the path context
+dirpath="$(dirname "$filepath")"
+
+TMP_DIRPATH=$(mktemp -d -t tjz.XXXXXXXX)
+tmp_tar_bz2="$TMP_DIRPATH/$filename.tar.bz2"
+
+# COPYFILE_DISABLE=1 ignores extended attributes (xattr) on Mac OS X
+COPYFILE_DISABLE=1 tar -cjf "$tmp_tar_bz2" -C "$dirpath" --exclude='.DS_Store' --exclude='._.DS_Store' "$filename"
+# >&2 echo created "$tmp_tar_bz2"
+link "$tmp_tar_bz2" "$filepath.tar.bz2"
+
+tmp_filepath="/tmp/$(basename $filepath)-$(date +%Y%m%dT%H%M%S)"
+mv "$filepath" "$tmp_filepath"
+
+echo created "$(basename "$filepath").tar.bz2" and moved original to "$tmp_filepath"

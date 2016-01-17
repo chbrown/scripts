@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+# if there are no arguments, this will default $@ to --help, so it works for all cases.
+if [[ "${@---help}" =~ '--help' ]]; then
+  if [[ "${@}" =~ '--help' ]]
+  then
+    echo "rmfile: illegal option -- -"
+  fi
+  echo "usage: rmfile file ..."
+  echo
+  echo "rmfile is like rmdir; it only deletes a file if the file is empty."
+  exit 1
+fi
+
+EXITCODE=0
+
+function print_error {
+  echo "rmfile: $1"
+  EXITCODE=1
+}
+
+for file in "$@"; do
+  # file must 1) exist, 2) be a file, and 3) be empty
+  if [[ -e "$file" ]]; then
+    # file exists
+    if [[ -f "$file" ]]; then
+      # file is a regular file
+      if [[ -s "$file" ]]; then
+        # file is not zero size
+        print_error "$file: File not empty"
+      else
+        # yay, all conditions are met; delete it
+        rm "$file"
+        # TODO: check that rm was successful and set EXITCODE if not
+      fi
+    else
+      print_error "$file: Not a file"
+    fi
+  else
+    print_error "$file: No such file or directory"
+  fi
+done
+
+exit $EXITCODE

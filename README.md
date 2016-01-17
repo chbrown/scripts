@@ -523,6 +523,27 @@ Open up a webpage in PhantomJS and render it to an image file in the current dir
 
 It outputs the filename it used, among other things.
 
+# rmfile
+
+`rmfile` is like the standard POSIX `rmdir`, but for files—it only deletes a file if the file is empty.
+
+    $ touch blank.txt
+    $ rmfile blank.txt
+                                        # no output, indicating success
+    $ mkdir subdir
+    $ rmfile subdir
+    rmfile: subdir: Not a file
+
+    $ echo 'hello world' > hello.txt
+    $ rmfile hello.txt
+    rmfile: hello.txt: File not empty
+
+    $ rmfile nothere.txt
+    rmfile: nothere.txt: No such file or directory
+
+
+Also serves as a pretty good example for writing a script with POSIX-like error messages, exit codes, and output.
+
 # sf
 
 Little helper for the awesome `sshfs` tool that OS X Fuse provides. It'll make the given directory as needed, and die quietly if the connection already exists.

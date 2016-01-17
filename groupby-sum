@@ -1,0 +1,6 @@
+#!/usr/bin/env awk -f
+# call with <value>\t<count> lines coming from STDIN
+    { groups[$1] += $2 }
+END { for (key in groups)
+        printf("%s\t%s\n", key, groups[key])
+    }

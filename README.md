@@ -157,6 +157,24 @@ Not yet supported:
 
     github-api /repos/chbrown/flickr-with-oauth/issues state=closed
 
+# groupby-sum
+
+Given whitespace-separated input on STDIN with lines like `<value>\t<count>`, group by unique values and sum the counts for each group. Example:
+
+    $ groupby-sum <<EOF
+    a 10
+    b 1
+    a 20
+    a 30
+    b 2
+    a 40
+    EOF
+
+Output:
+
+    a   100
+    b   3
+
 # htpasswd.py
 
 Script originally from a guy named "Eli Carter."

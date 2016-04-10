@@ -4,18 +4,17 @@
 if [[ "${@---help}" =~ '--help' ]]; then
   if [[ "${@}" =~ '--help' ]]
   then
-    echo "rmfile: illegal option -- -"
+    printf "rmfile: illegal option -- -\n"
   fi
-  echo "usage: rmfile file ..."
-  echo
-  echo "rmfile is like rmdir; it only deletes a file if the file is empty."
+  printf "usage: rmfile file ...\n\n"
+  printf "rmfile is like rmdir; it only deletes a file if the file is empty.\n"
   exit 1
 fi
 
 EXITCODE=0
 
 function print_error {
-  echo "rmfile: $1"
+  printf "rmfile: %s\n" "$1"
   EXITCODE=1
 }
 

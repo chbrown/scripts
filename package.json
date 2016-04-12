@@ -2,20 +2,25 @@
   "name": "scripts",
   "version": "0.2.0",
   "description": "Handy scripts",
-  "keywords": ["scripts"],
+  "keywords": [
+    "scripts"
+  ],
   "homepage": "https://github.com/chbrown/scripts",
-  "repository": "git://github.com/chbrown/scripts.git",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chbrown/scripts.git"
+  },
   "author": "Christopher Brown <io@henrian.com> (http://henrian.com)",
+  "private": true,
   "license": "MIT",
   "dependencies": {
     "async": "*",
     "js-yaml": "*",
     "loge": "*",
     "marked": "*",
+    "minimist": "*",
     "optimist": "*",
-    "streaming": ">=0.3.12",
-    "temp": "*",
-    "yargs": "*"
-  },
-  "private": true
+    "streaming": "*",
+    "temp": "*"
+  }
 }

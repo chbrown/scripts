@@ -474,6 +474,16 @@ Pretty print XML using [`lxml`](http://lxml.de/) (or [`BeautifulSoup`](http://ww
 
 Not like XML gets pretty. It just gets pretti*er*.
 
+# prefix
+
+Prefix file(s) with a literal string or timestamp, in the latter case, the birthtime of the specified file(s).
+
+    prefix ExportArticle.pdf
+
+Supposing `ExportArticle.pdf` was created on 2016-04-11, this moves `ExportArticle.pdf` to `20160411-ExportArticle.pdf`.
+
+If the target destination exists, `prefix` exits with an error. See `prefix --help` for more options.
+
 # prependbom
 
 Prepend the UTF-8 byte order marker (BOM) to the input. Uses `fileinput`, so STDIN and all files supplied as command line arguments will be streamed to STDOUT after the BOM byte sequence, `\xef\xbb\xbf`.

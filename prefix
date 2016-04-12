@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+# SCRIPT_NAME will be 'prefix', presumably
+SCRIPT_NAME="$(basename "$0")"
+
+if [[ "${@---help}" =~ '--help' ]]; then
+  printf "Prefix file(s) with a string or timestamp\n"
+  printf "Optional arguments are set via environment variables:\n"
+  # printf escapes % via doubling
+  printf "  PATTERN: a strftime compatible format (defaults to %%Y%%m%%d-)\n"
+  # printf "  : a strftime compatible format\n"
+  printf "\n"
+  printf "Examples:\n"
+  printf "  PATTERN=%%Y%%m%%d-%%H%%M%%S- %s IMG_7669.jpg\n" "$SCRIPT_NAME"
+  printf "    prefix a file with a full timestamp rather than just the date\n"
+  printf "  PATTERN=\$(date +%%Y%%m%%d)- %s IMG_7669.jpg\n" "$SCRIPT_NAME"
+  printf "    prefix a file with the date at time of execution, rather than the date of the file\n"
+  exit 1
+fi
+
+PATTERN=${PATTERN-%Y%m%d-}
+
+EXITCODE=0
+
+for FILE in "$@"; do
+  # %B selects the birth time of the inode (file)
+  # %SB specifies that the birth time should be converted to a string, via the -t timefmt argument if provided
+  PREFIX="$(stat -f '%SB' -t "$PATTERN" "$FILE")"
+  stat_exit_status=$?
+  if [[ $stat_exit_status -ne 0 ]]; then
+    EXITCODE=1
+  else
+    TARGET="$(dirname "$FILE")/$PREFIX$(basename "$FILE")"
+    # vulnerable to race condition but whatever, 'mv -n source target' is apparently non-standard (as is -v)
+    if [ -e "$TARGET" ]; then
+      >&2 printf "Failed to prefix '%s'; '%s' already exists\n" "$(basename "$FILE")" "$(basename "$TARGET")"
+      EXITCODE=1
+    else
+      >&2 printf "mv %s %s\n" "$(basename "$FILE")" "$(basename "$TARGET")"
+      mv "$FILE" "$TARGET"
+      mv_exit_status=$?
+      if [[ $mv_exit_status -ne 0 ]]; then
+        EXITCODE=1
+      fi
+    fi
+  fi
+done
+
+exit $EXITCODE

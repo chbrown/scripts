@@ -11,7 +11,7 @@ INPUT_FILENAME=$1
 OUTPUT_FILENAME="${INPUT_FILENAME%.pdf}.gs.pdf"
 
 # set -x
-printf "Ghostscript writing '%s' to '%s'" "$INPUT_FILENAME" "$OUTPUT_FILENAME\n"
+printf "Ghostscript: rewriting '%s' as '%s'\n" "$INPUT_FILENAME" "$OUTPUT_FILENAME"
 
 # gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=${temp_pdf_path} opts.input
 # The -o option also sets the -dBATCH and -dNOPAUSE options.

@@ -13,7 +13,7 @@ fi
 
 EXITCODE=0
 
-function print_error {
+print_error() {
   printf "rmfile: %s\n" "$1"
   EXITCODE=1
 }

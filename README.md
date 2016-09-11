@@ -668,6 +668,12 @@ Uh, what? So it looks through lines of json and prints just the "text" attribute
 
 List all active ssh tunnels, looking for something like `ssh ... -L ...`.
 
+# `trim_trailing_whitespace`
+
+Bash script wrapper around `sed` call to delete trailing whitespace, **in-place**.
+
+    trim_trailing_whitespace README.md
+
 # tgz
 
 Wrapper around `tar cz`, basically:

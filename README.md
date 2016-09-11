@@ -360,6 +360,14 @@ MySQL helper for creating a table directly from a csv file.
 
 The first column of the table should be unique integers, and it will be named `pkid`.
 
+# nargs
+
+One-line bash script to print out the number of arguments passed in.
+Useful for debugging variables and variable expansion.
+
+    nargs "Just two" arguments
+    > 2
+
 # now
 
 Print out the current datetime in some variation on ISO-8601:

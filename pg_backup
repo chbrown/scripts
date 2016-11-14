@@ -19,7 +19,10 @@ fi
 
 echo "Dumping PostgreSQL database '$DATABASE' to '$FILENAME'"
 
-pg_dump "$DATABASE" | bzip2 > "$FILENAME"
+# --clean: clean (drop) database objects before recreating
+# --create: include commands to create database in dump
+# --no-owner: skip restoration of object ownership
+pg_dump --clean --create --no-owner "$DATABASE" | bzip2 > "$FILENAME"
 
 if [[ ${PIPESTATUS[0]} != 0 ]]; then
   echo "Removing '$FILENAME' due to 'pg_dump' error"

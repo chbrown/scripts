@@ -121,9 +121,14 @@ One-liner for when you have some lengthy lines and you want to kill the wrap:
 
 # fixpdf
 
-Wrapper around `gs` command, with reasonable options and a default conversion filename (append `-gs` to basename):
+Wrapper around `gs` command with reasonable options.
 
     fixpdf Bulky.pdf
+
+> fixpdf: wrote gs output to Bulky-gs.pdf
+
+Writes to the path specified by the second argument,
+or appends `-gs` to the basename of the first argument if no other arguments are supplied.
 
 # git-remote-tags
 

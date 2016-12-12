@@ -1,20 +1,14 @@
-#!/usr/bin/env python
-import sys
-import argparse
-from subprocess import Popen
+#!/usr/bin/env bash
+if [[ "${@---help}" =~ '--help' ]]; then
+  >&2 cat <<EOS
+Ghostscript (gs) wrapper with common defaults (NOPAUSE, BATCH, DEVICE=pdfwrite).
+Appends -gs to the first argument's basename if no second argument is supplied.
 
-parser = argparse.ArgumentParser(description='gs (ghostscript) wrapper',
-    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('input', help='input PDF')
-parser.add_argument('output', nargs='?', help='output PDF (defaults to <input>-gs.pdf)')
-# parser.add_argument('-v', '--verbose', action='store_true', help='print gs output')
-opts = parser.parse_args()
+    Example: fixpdf book.pdf [book-gs.pdf]
+EOS
+  exit 1
+fi
 
-input_path = opts.input
-output_path = opts.output or input_path.replace('.pdf', '-gs.pdf')
-
-args = ['gs', '-q', '-dNOPAUSE', '-dBATCH', '-sDEVICE=pdfwrite', '-sOutputFile=%s' % output_path, '-f', input_path]
-print >> sys.stderr, ' '.join(args)
-
-gs_process = Popen(args)
-gs_process.wait()
+OUTPUT="${2-${1/.pdf/-gs.pdf}}"
+gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=$OUTPUT -f $1
+>&2 printf "fixpdf: wrote gs output to %s\n" "$OUTPUT"

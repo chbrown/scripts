@@ -26,7 +26,6 @@ fi
 # prepare the temporary output file
 # $(mktemp -d) is the only argument structure that works equivalently on both Linux and OS X (at least, 10.11)
 TMP_FILEPATH=$(mktemp -d)/"$(basename $FILEPATH)"
-# >&2 printf "writing output to temporary file: $TMP_FILEPATH\n"
 
 # run the command
 jq "$@" > "$TMP_FILEPATH"

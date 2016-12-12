@@ -244,7 +244,7 @@ For example, to pretty-print a JSON file in-place:
 
 It uses the last command line argument as the file that it will overwrite, so it only really makes sense to have one input file.
 
-It prints the temporary and backup filepaths it uses to `stderr`.
+If it encounters any errors, it prints the temporary and backup filepaths it uses to `stderr`.
 
 # jsmap
 

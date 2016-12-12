@@ -1,24 +1,42 @@
 #!/usr/bin/env bash
-# the final command line argument will be the file we overwrite
-FILE=${@: -1}
-if [[ ! -e "$FILE" ]]; then
-  echo 'The final argument must be an existing file'
+if [[ "${@---help}" =~ '--help' ]]; then
+  >&2 cat <<EOS
+Like jq, but replaces the input file with jq's output. The final command line
+argument should be the JSON file to overwrite, and the same arguments should,
+if called with jq instead of jqi, run without error (and output to stdout).
+
+    Example: jqi . package.json
+EOS
   exit 1
 fi
-# prepare the temporary output file
-TMP_DIRPATH=$(mktemp -d -t jqi.XXXXXXXX)
-TMP_FILEPATH=$TMP_DIRPATH/$(basename $FILE)
->&2 echo "writing output to temporary file: $TMP_FILEPATH"
-# run the command
-jq $@ > "${TMP_FILEPATH}"
-jq_status=$?
-if [[ $jq_status -ne 0 ]]; then
-  echo "jq command failed"
-  exit $jq_status
+
+# call with two arguments: an exit code and an error message
+exit_if_nonzero() {
+  if [[ $1 -ne 0 ]]; then
+    >&2 printf "jqi: %s\n" "$2"
+    exit $1
+  fi
+}
+
+FILEPATH="${@: -1}"
+if [[ ! -f "$FILEPATH" ]]; then
+  exit_if_nonzero 1 "the final argument must be an existing, regular file"
 fi
+
+# prepare the temporary output file
+# $(mktemp -d) is the only argument structure that works equivalently on both Linux and OS X (at least, 10.11)
+TMP_FILEPATH=$(mktemp -d)/"$(basename $FILEPATH)"
+# >&2 printf "writing output to temporary file: $TMP_FILEPATH\n"
+
+# run the command
+jq $@ > "$TMP_FILEPATH"
+exit_if_nonzero $? "jq failure"
+
 # backup the original file
-BAK_FILEPATH=${TMP_FILEPATH}.bak
->&2 echo "backing up original file: $BAK_FILEPATH"
-link "$FILE" "$BAK_FILEPATH"
-unlink "$FILE"
-mv "$TMP_FILEPATH" "$FILE"
+BAK_FILEPATH=$(mktemp -d)/"$(basename $FILEPATH)"
+mv "$FILEPATH" "$BAK_FILEPATH"
+exit_if_nonzero $? "mv failure: could not backup $FILEPATH to $BAK_FILEPATH"
+
+# put the temporary file into the original's place
+mv -n "$TMP_FILEPATH" "$FILEPATH"
+exit_if_nonzero $? "mv failure: could not move $TMP_FILEPATH to $FILEPATH; recommend you restore backup version at $BAK_FILEPATH"

@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+if ((-t STDIN && !@ARGV) || grep {$_ eq '--help'} @ARGV) {
+  print STDERR <<EOS
+Tabulate bags of words from text supplied on STDIN. Each input line is treated
+as a distinct document and split on whitespace. Prints out each bag of words in
+type:number format, most common first (ordering for types with same total count
+is undefined).
+
+    Example: bow <browncorpus.txt
+EOS
+;
+  exit 1
+}
+
+while (my $line = <>) {
+  # using ' ' as the separator in split triggers special behavior:
+  # first trim whitespace from the ends and then split on /\s+/
+  my @words = split(' ', $line);
+  my %counts;
+  foreach (@words) {
+    # $_ is set to each item in @words
+    $counts{$_}++;
+  }
+  # declare output variable
+  my @parts;
+  # sort by largest-count-first
+  foreach my $word (sort { $counts{$b} <=> $counts{$a} } keys %counts) {
+    push(@parts, "$word:$counts{$word}");
+  }
+  print join(' ', @parts), "\n";
+}

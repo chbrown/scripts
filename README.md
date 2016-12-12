@@ -45,6 +45,17 @@ Watch a directory for changed files and restart a process when a change is detec
 
 From [stevekrenzel/autoreload](https://github.com/stevekrenzel/autoreload) (no license).
 
+# bow
+
+Tabulate bags of words from text supplied on STDIN. Each input line is treated
+as a distinct document and split on whitespace. Prints out each bag of words in
+type:number format, most common first (ordering for types with same total count
+is undefined).
+
+    echo 'the dog bit the man who pet the other dog' | bow
+
+> the:3 dog:2 other:1 who:1 bit:1 man:1 pet:1
+
 
 # click
 

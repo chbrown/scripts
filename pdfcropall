@@ -1,24 +1,11 @@
-#!/usr/bin/env python
-import os
-import argparse
-from glob import glob
+#!/usr/bin/env bash
+if [[ "${@---help}" =~ '--help' ]]; then
+  printf "Run pdfcrop on each argument, with meager (but non-zero) margins,\n"
+  printf "using pdfcrop's default output naming scheme (append -crop to basename)\n\n"
+  printf "  Example: pdfcropall paper.pdf appendices-*.pdf\n"
+  exit 1
+fi
 
-
-def flatten_glob_list(fileglobs):
-    for fileglob in fileglobs:
-        for filepath in glob(fileglob):
-            yield filepath
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='PDF Cropper',
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('files', nargs='*', default='*.pdf')
-    parser.add_argument('--force', action='store_true')
-    opts = parser.parse_args()
-    # print 'Cropping: %s' % opts.files
-
-    for filepath_orig in flatten_glob_list(opts.files):
-        if 'pdf' in filepath_orig and '-crop' not in filepath_orig:
-            filepath_cropped = filepath_orig.replace('.pdf', '-crop.pdf')
-            if opts.force or not os.path.exists(filepath_cropped):
-                os.system('pdfcrop --margins 2 --clip "%s" "%s"' % (filepath_orig, filepath_cropped))
+for FILE in "$@"; do
+  pdfcrop --margins 2 --clip "$FILE"
+done

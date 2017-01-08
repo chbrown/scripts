@@ -118,28 +118,11 @@ Open any [GitHub](https://github.com/) pages which the current git repo has as r
     cd ~/scripts
     gh # opens https://github.com/chbrown/scripts in your browser
 
-# gscat
-
-Short wrapper around the Ghostscript command, `gs`, that simply reads in a PDF and outputs the same PDF with the extension `.gs.pdf` instead of `.pdf`. This is useful with large PDFs, or copy-protected PDFs, etc., where you just want a plain, simple, efficient, no-nonsense PDF to work from.
-
-    gscat High-res-proofs.pdf
-
 # fit
 
 One-liner for when you have some lengthy lines and you want to kill the wrap:
 
     tr '\t' ' ' | cut -c -$(tput cols)
-
-# fixpdf
-
-Wrapper around `gs` command with reasonable options.
-
-    fixpdf Bulky.pdf
-
-> fixpdf: wrote gs output to Bulky-gs.pdf
-
-Writes to the path specified by the second argument,
-or appends `-gs` to the basename of the first argument if no other arguments are supplied.
 
 # git-remote-tags
 
@@ -422,13 +405,10 @@ Like `col`, but auto-adjusts with more text. Slower, obviously.
 
 # pdfcat
 
-`gs | pdftk cat output` helper.
+Simple wrapper around Ghostscript (the `gs` binary) to read in one or more PDFs and output a PDF with the same name as the first argument, but with a `.gs.pdf` extension instead of `.pdf`.
+This is useful with large PDFs, or copy-protected PDFs, etc., where you just want a plain, simple, efficient, no-nonsense PDF to work from.
 
-    pdfcat page1.pdf page2.pdf bothpages.pdf
-
-Or
-
-    pdfcat page1.pdf page2.pdf > bothpages.pdf
+    pdfcat chap1.pdf chap2.pdf chap2.pdf
 
 # pdfcount
 

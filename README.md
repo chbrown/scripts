@@ -528,14 +528,6 @@ Needs to be generalized. Currently copies everything from a hard-coded remote ho
 
 But you get the idea.
 
-# renderpage
-
-Open up a webpage in PhantomJS and render it to an image file in the current directory. The filename is based on the given URL.
-
-    renderpage http://irinawerning.com/bttf2/back-to-the-future-2-2011/
-
-It outputs the filename it used, among other things.
-
 # rmfile
 
 `rmfile` is like the standard POSIX `rmdir`, but for files—it only deletes a file if the file is empty.

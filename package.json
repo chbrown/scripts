@@ -18,7 +18,6 @@
     "js-yaml": "*",
     "loge": "*",
     "marked": "*",
-    "minimist": "*",
     "optimist": "*",
     "streaming": "*",
     "temp": "*"

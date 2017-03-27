@@ -18,6 +18,7 @@ def read_hardware_mac_address():
     hex_pairs = match.group(1).split(':')
     return [int(hex_pair, 16) for hex_pair in hex_pairs]
 
+
 def read_current_mac_address():
     '''
     Issues a system call to ifconfig and returns a list of bytes representing
@@ -28,6 +29,7 @@ def read_current_mac_address():
     hex_pairs = match.group(1).split(':')
     return [int(hex_pair, 16) for hex_pair in hex_pairs]
 
+
 def format_mac_address(octets, sep=':'):
     '''
     Take a byte-array representation of a MAC address and return a hex-encoded
@@ -35,10 +37,12 @@ def format_mac_address(octets, sep=':'):
     '''
     return sep.join(['%02x' % octet for octet in octets])
 
+
 def generate_random_mac_address():
     # first octet/number must be even, apparently
     # any 48-bit number, i.e., a number between 0 and 2^48
     return [random.randint(0, 127) * 2] + [random.randint(0, 255) for _ in range(5)]
+
 
 def set_mac_address(target_mac_address):
     '''
@@ -64,14 +68,17 @@ def generate():
     '''Print a random valid MAC address to STDOUT'''
     print format_mac_address(generate_random_mac_address())
 
+
 def info():
     '''Print the current MAC address'''
     print format_mac_address(read_current_mac_address())
+
 
 def randomize():
     '''Set the current MAC address to a random address'''
     random_mac_address = generate_random_mac_address()
     set_mac_address(random_mac_address)
+
 
 def revert():
     '''Set the current MAC address to the hardware's original address'''

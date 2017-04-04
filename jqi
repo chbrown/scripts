@@ -1,38 +1,38 @@
 #!/usr/bin/env bash
 if [[ "${@---help}" =~ '--help' ]]; then
-  >&2 cat <<EOS
+  >&2 cat <<HELP
+Usage: jqi . package.json
+
 Like jq, but replaces the input file with jq's output. The final command line
 argument should be the JSON file to overwrite, and the same arguments should,
 if called with jq instead of jqi, run without error (and output to stdout).
-
-    Example: jqi . package.json
-EOS
+HELP
   exit 1
 fi
+
+FILEPATH="${@: -1}"
 
 # call with two arguments: an exit code and an error message
 exit_if_nonzero() {
   if [[ $1 -ne 0 ]]; then
-    >&2 printf "jqi: %s\n" "$2"
+    >&2 printf "jqi %s: %s\n" "$FILEPATH" "$2"
     exit $1
   fi
 }
 
-FILEPATH="${@: -1}"
 if [[ ! -f "$FILEPATH" ]]; then
-  exit_if_nonzero 1 "the final argument must be an existing, regular file"
+  exit_if_nonzero 66 "the final argument must be an existing, regular file" # EX_NOINPUT
 fi
 
 # prepare the temporary output file
-# $(mktemp -d) is the only argument structure that works equivalently on both Linux and OS X (at least, 10.11)
-TMP_FILEPATH=$(mktemp -d)/"$(basename $FILEPATH)"
+TMP_FILEPATH="$(mktemp -d)/$(basename $FILEPATH)"
 
 # run the command
 jq "$@" > "$TMP_FILEPATH"
 exit_if_nonzero $? "jq failure"
 
 # backup the original file
-BAK_FILEPATH=$(mktemp -d)/"$(basename $FILEPATH)"
+BAK_FILEPATH="$(mktemp -d)/$(basename $FILEPATH)"
 mv "$FILEPATH" "$BAK_FILEPATH"
 exit_if_nonzero $? "mv failure: could not backup $FILEPATH to $BAK_FILEPATH"
 

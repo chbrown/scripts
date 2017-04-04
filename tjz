@@ -18,13 +18,13 @@ set -e # exit on first command that fails
 
 # remove trailing slash (hopefully there's only one)
 original="${1%/}"
-name="$(basename "$original")"
 
 # check that the given filepath exists
 [ ! -e "$original" ] && >&2 printf "%s does not exist.\n" "$original" && exit 1
 # check that the eventual output does not exist
 [ -e "$original.tar.bz2" ] && >&2 printf "%s already exists, not overwriting.\n" "$original.tar.bz2" && exit 1
 
+name="$(basename "$original")"
 # write to a temporary .tar.bz2 file first
 tmp_tar_bz2="${TMPDIR-/tmp/}$name.tar.bz2"
 # COPYFILE_DISABLE=1 ignores extended attributes (xattr) on Mac OS X

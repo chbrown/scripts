@@ -367,6 +367,12 @@ Useful for debugging variables and variable expansion.
     nargs "Just two" arguments
     > 2
 
+# openssl-showcerts
+
+Use `openssl` to retrieve and print information about the SSL/TLS certificate(s) offered by a server on the internet.
+
+    openssl-showcerts serverfault.com
+
 # otf2ttf2eot.sh
 
 Convert an OTF font file to EOT with fontforge

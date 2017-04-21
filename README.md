@@ -111,6 +111,12 @@ Wait until a page doesn't scroll down anymore, and then output the DOM to `STDOU
 
     curlweb2.0 http://animalstalkinginallcaps.tumblr.com/
 
+# doi
+
+Download BibTeX using [CrossRef's](https://www.crossref.org/) [content negotiation functionality](https://www.crossref.org/blog/content-negotiation-for-crossref-dois/), then reformat with [bartleby](https://github.com/chbrown/bartleby).
+
+    doi 10.1109/5.771073
+
 # gh
 
 Open any [GitHub](https://github.com/) pages which the current git repo has as remotes.

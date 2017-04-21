@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+if [[ "${@---help}" =~ '--help' ]]; then
+  >&2 cat <<HELP
+Usage: doi 10.1109/5.771073
+
+Download BibTeX using CrossRef's content negotiation functionality,
+then reformat with bartleby (https://github.com/chbrown/bartleby).
+HELP
+  exit 1
+fi
+
+URL="https://doi.org/$1"
+curl -s -L -H "Accept: text/bibliography;style=bibtex" "$URL" | bart cat

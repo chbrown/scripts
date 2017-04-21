@@ -448,11 +448,9 @@ Pretty print JSON (using Python's `json.dumps`, sorting keys and indenting by tw
 
 # ppxml
 
-Pretty print XML using [`lxml`](http://lxml.de/) (or [`BeautifulSoup`](http://www.crummy.com/software/BeautifulSoup/), if you use the flag `-f soup`).
+Pretty print XML using [Libxml](http://xmlsoft.org/)'s [`xmllint`](http://xmlsoft.org/xmllint.html) tool.
 
     ppxml APW19980322.0749.tml
-
-Not like XML gets pretty. It just gets pretti*er*.
 
 # prefix
 

@@ -1,42 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env bash
+if [[ "$@" =~ '--help' ]]; then
+  >&2 cat <<HELP
+Usage: ppxml < machine.xml
 
+Pretty print XML, using Libxml's xmllint tool.
+HELP
+  exit 1
+fi
 
-def soup(infile, outfile):
-    from bs4 import BeautifulSoup
-
-    soup = BeautifulSoup(infile)
-    outfile.write(soup.prettify())
-
-
-def lxml(infile, outfile):
-    from lxml import etree
-
-    parser = etree.XMLParser(remove_blank_text=True)
-    tree = etree.parse(infile, parser)
-    etree.cleanup_namespaces(tree)
-
-    outfile.write(etree.tostring(tree, pretty_print=True))
-
-
-def main():
-    # closures are nice
-    import sys
-    import argparse
-    formatters = dict(soup=soup, lxml=lxml)
-
-    parser = argparse.ArgumentParser(description='Prettyprint XML',
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('infile', nargs='?', type=argparse.FileType('r'), default=sys.stdin,
-        help='Ugly XML path (defaults to STDIN)')
-    parser.add_argument('outfile', nargs='?', type=argparse.FileType('w'), default=sys.stdout,
-        help='Pretty XML path (defaults to STDOUT)')
-    parser.add_argument('-f', '--formatter', choices=formatters, default='lxml',
-        help='Library to use to format pretty xml (defaults to lxml)')
-
-    opts = parser.parse_args()
-
-    formatters[opts.formatter](opts.infile, opts.outfile)
-
-if __name__ == '__main__':
-    # trying to keep a sane namespace
-    main()
+xmllint --format "${@--}"

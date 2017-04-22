@@ -30,6 +30,16 @@ Except for following files, I am the sole author of all of these scripts.
 
 ---
 
+# active
+
+Remove inactive lines; i.e., lines that are empty, whitespace-only, or where the first non-whitespace character is `#` (which is the usual comment indicator).
+
+    cat /etc/hosts | active
+
+It uses a `sed -f` shebang, so, alternatively:
+
+    active /etc/hosts
+
 # alphadec
 
 Create 10 alphadecimal passwords of length 16 each.

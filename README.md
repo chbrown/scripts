@@ -686,6 +686,14 @@ Super-complicated Awk script for transposing like in Excel.
 
     transpose alice-results.dat | pcol -g 2
 
+# triage
+
+List the total sizes of the specified directories' children nodes, in Megabytes, sorted from smallest to largest.
+
+    triage Desktop Music Downloads
+
+Without arguments, defaults to the current directory, as if calling `triage .`
+
 # tx
 
 Like [`ptx`](#ptx), but with a `latex && dvipdf` pipeline instead of `pdflatex`.

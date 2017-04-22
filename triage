@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+if [[ "$@" =~ '--help'] || ["$@" =~ '-h' ]]; then
+  >&2 cat <<HELP
+Usage: triage
+
+List the total sizes of the specified directory's children nodes,
+in Megabytes, sorted from smallest to largest.
+HELP
+  exit 1
+fi
+
+# du:
+#   -m   Display sizes in units of 1 Mbyte (1048576 bytes)
+#   -d 1 Recurse down into children, but no further
+#   @%/  Trim trailing slash from each argument given at the command line
+# sort:
+#   -g   Compare numerically rather than lexicographically
+du -m -d 1 "${@%/}" | sort -g

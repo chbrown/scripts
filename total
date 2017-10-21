@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+if [[ "$@" =~ '--help' ]]; then
+  >&2 cat <<HELP
+Usage: printf "1\n2 3\n4 5 6" | total
+
+Sum all numbers given on stdin, separated by any kind of whitespace.
+HELP
+  exit 1
+fi
+
+# thanks to https://stackoverflow.com/a/3096575
+# (might need to use awk/perl for lots of numbers)
+# 1. convert all space to newlines
+# 2. use paste to insert + between all the lines
+# 3. add a newline to ensure that bc has _something_ to compute
+# 4. add everything with bc (basic calculator)
+tr -s '[:space:]' $'\n' | paste -sd+ - | cat - <(printf "\n") | bc

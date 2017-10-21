@@ -680,6 +680,16 @@ Run `tar cj` and move the original into `/tmp`:
 
 It will exit gracefully if the original does not exist, or if the target `$1.tar.bz2` file already exists.
 
+# total
+
+Sum all numbers given on stdin, separated by any kind of whitespace.
+
+Uses `tr`, `paste`, and `printf` to format the input into an equation format.
+
+Then runs `bc` ("An arbitrary precision calculator language") to compute the sum.
+
+    printf "1\n2 3\n4 5 6" | total
+
 # transpose
 
 Super-complicated Awk script for transposing like in Excel.

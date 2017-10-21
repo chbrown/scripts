@@ -340,14 +340,6 @@ MD5 hash the last command line argument.
 
 _N.b._: If given a filename, this doesn't sum a file, but the filename!
 
-# mysqlshove
-
-MySQL helper for creating a table directly from a csv file.
-
-    mysqlshove somedb maps/coords.csv --table some_new_table -u root
-
-The first column of the table should be unique integers, and it will be named `pkid`.
-
 # nargs
 
 One-line bash script to print out the number of arguments passed in.

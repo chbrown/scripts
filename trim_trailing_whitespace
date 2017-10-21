@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-if [[ "${@---help}" =~ '--help' ]]; then
-  echo "Use sed to delete all trailing whitespace from the given file"
-  exit 1
-fi
-
-sed -i '' 's/[[:space:]]\+$//' $1

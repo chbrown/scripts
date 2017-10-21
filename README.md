@@ -58,29 +58,6 @@ is undefined).
 > the:3 dog:2 other:1 who:1 bit:1 man:1 pet:1
 
 
-
-# cfmt
-
-Beautify all source code in `./src/*.c` and `./src/*.h`, in-place.
-
-Uses [`astyle`](http://astyle.sourceforge.net/) with the following options:
-
-    astyle
-       --style=java
-       --
-       --unpad-paren
-       --delete-empty-lines
-       --add-brackets
-       --convert-tabs
-       --align-pointer=type
-       --lineend=linux
-       --suffix=none $file
-
-Get `astyle` from your package manager, e.g.:
-
-    brew install astyle
-
-
 # crawl
 
 A shortcut to this `wget` sequence:

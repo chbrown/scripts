@@ -340,12 +340,6 @@ MD5 hash the last command line argument.
 
 _N.b._: If given a filename, this doesn't sum a file, but the filename!
 
-# mongomigrate.rb
-
-Copy the MongoDB somewhere to somewhere else.
-
-    mongomigrate.rb asl:drags localhost:drags
-
 # mysqlshove
 
 MySQL helper for creating a table directly from a csv file.

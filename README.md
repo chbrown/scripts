@@ -22,7 +22,6 @@ Copyright © 2012–2013 Christopher Brown. [MIT Licensed](LICENSE).
 
 Except for following files, I am the sole author of all of these scripts.
 
-* `autoreload`
 * `htpasswd.py`
 * `otf2ttf2eot.sh`
 * `transpose`
@@ -46,14 +45,6 @@ Create 10 alphadecimal passwords of length 16 each.
 
     alphadec --length 16 --count 10
 
-
-# autoreload
-
-Watch a directory for changed files and restart a process when a change is detected.
-
-    autoreload python main.py
-
-From [stevekrenzel/autoreload](https://github.com/stevekrenzel/autoreload) (no license).
 
 # bow
 

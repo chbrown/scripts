@@ -58,12 +58,6 @@ is undefined).
 > the:3 dog:2 other:1 who:1 bit:1 man:1 pet:1
 
 
-# click
-
-Measured from the top left of the screen, left-click once.
-
-    click -x 600 -y 400
-
 
 # cfmt
 

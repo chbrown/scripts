@@ -3,9 +3,10 @@ if [[ "$@" =~ '--help' ]]; then
   >&2 cat <<HELP
 Usage: ppxml < machine.xml
 
-Pretty print XML, using Libxml's xmllint tool.
+Pretty print XML, using Libxml's xmllint tool,
+then normalize Unicode to NFC with ICU's uconv tool.
 HELP
   exit 1
 fi
 
-xmllint --format "${@--}"
+xmllint --format "${@--}" | uconv -x any-nfc

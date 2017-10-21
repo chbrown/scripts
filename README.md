@@ -171,6 +171,13 @@ Not yet supported:
 
     github-api /repos/chbrown/flickr-with-oauth/issues state=closed
 
+# grephistory
+
+Case-insensitively `grep` through `~/.bash_history`.
+All arguments are combined into a single string.
+
+    grephistory lein run
+
 # groupby-sum
 
 Given whitespace-separated input on STDIN with lines like `<value>\t<count>`, group by unique values and sum the counts for each group. Example:

@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+if [[ "${@---help}" =~ '--help' ]]; then
+  >&2 cat <<HELP
+Usage: grephistory ancient
+
+Like history | grep ...; searches ~/.bash_history but without line numbers.
+HELP
+  exit 1
+fi
+
+grep -i "$*" ~/.bash_history

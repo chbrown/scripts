@@ -636,10 +636,6 @@ Like whois-domains, take a list of domains, separated by newlines, and query who
 
     echo henrian.com | taken
 
-# textext
-
-Uh, what? So it looks through lines of json and prints just the "text" attribute. I guess if you want to look as just Tweet text. Something like `npm install json` and then `cat feed.json | json -C text` would do the same thing.
-
 # tnls
 
 List all active ssh tunnels, looking for something like `ssh ... -L ...`.

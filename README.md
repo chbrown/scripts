@@ -120,18 +120,30 @@ Thanks goes to [stackoverflow](http://stackoverflow.com/questions/1260748/how-do
 
 # github-api
 
-Simple request and printing helper for the Github API v3 (automatically pulls in `$GITHUB_TOKEN` environment variable).
+Send requests to the GitHub REST API v3 and print responses nicely.
+Automatically pulls in `$GITHUB_TOKEN` environment variable, if available, to authorize requests.
 
-    github-api /user
-    github-api /user/emails
-    github-api /user/issues
-    github-api /users/isaacs
-    github-api /orgs/utcompling/members
-    github-api /repos/chbrown/flickr-with-oauth/events | json
+    github-api path /user
+    github-api path /user/emails
+    github-api path /user/issues
+    github-api path /users/isaacs
+    github-api path /orgs/utcompling/members
+    github-api path /repos/chbrown/rfc6902/events | jq
 
 Not yet supported:
 
-    github-api /repos/chbrown/flickr-with-oauth/issues state=closed
+    github-api path /repos/chbrown/rfc6902/issues state=closed
+
+Special-purpose subcommands:
+
+**`commits`** gets the first and last 100 commits for a repository.
+This is helpful because it's not easy to find when a repository was started on the GitHub website.
+
+    github-api commits --owner chbrown --repo rfc6902
+
+**`contents`** gets the contents of a file or directory (up to 1000 entries):
+
+    github-api contents --owner chbrown --repo scripts --path /
 
 # grephistory
 

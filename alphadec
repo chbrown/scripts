@@ -1,30 +1,42 @@
 #!/usr/bin/env python
 import random
 import argparse
-import string
 
-populations = dict(
-    all=string.uppercase + string.lowercase + string.digits,
-    alpha=string.uppercase + string.lowercase,
-    uppercase=string.uppercase,
-    lowercase=string.lowercase,
-    digits=string.digits,
-    upperdigits=string.digits + string.uppercase,
-    lowerdigits=string.digits + string.lowercase,
-    upperhex=string.digits + 'ABCDEF',
-    lowerhex=string.digits + 'abcdef',
-)
+ALPHABET_CAPITALS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+ALPHABET_SMALL = 'abcdefghijklmnopqrstuvwxyz'
+DIGITS = '0123456789'
+
+POPULATIONS = {
+    'all':         ALPHABET_CAPITALS + ALPHABET_SMALL + DIGITS,
+    'alpha':       ALPHABET_CAPITALS + ALPHABET_SMALL,
+    'uppercase':   ALPHABET_CAPITALS,
+    'lowercase':   ALPHABET_SMALL,
+    'digits':      DIGITS,
+    'upperdigits': DIGITS + ALPHABET_CAPITALS,
+    'lowerdigits': DIGITS + ALPHABET_SMALL,
+    'upperhex':    DIGITS + 'ABCDEF',
+    'lowerhex':    DIGITS + 'abcdef',
+}
 
 
-parser = argparse.ArgumentParser(description='Generate random strings',
-    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('--length', '-l', type=int, help='Length of each password', default=16)
-parser.add_argument('--count', '-c', type=int, help='Number of passwords', default=1)
-parser.add_argument('--population', '-p', choices=populations, help='Population to sample from', default='all')
-opts = parser.parse_args()
+def main():
+    parser = argparse.ArgumentParser(
+        description='Generate random strings',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--length', '-l', type=int, default=16,
+                        help='Length of each password')
+    parser.add_argument('--count', '-c', type=int, default=1,
+                        help='Number of passwords')
+    parser.add_argument('--population', '-p', choices=POPULATIONS, default='all',
+                        help='Population to sample from')
+    opts = parser.parse_args()
 
-pop = populations[opts.population]
+    population = POPULATIONS[opts.population]
+    k = opts.length
 
-for i in range(opts.count):
-    # always sample with replacement
-    print ''.join(pop[random.randrange(len(pop))] for _ in range(opts.length))
+    for _ in range(opts.count):
+        # random.choices does sampling with replacement
+        print(''.join(random.choices(population, k=k)))
+
+if __name__ == '__main__':
+    main()

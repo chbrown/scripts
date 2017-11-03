@@ -567,6 +567,14 @@ This can be destructive since it recurses over all files, including binaries; it
 
     style --fix ~/github/**/*.py
 
+# stmux
+
+SSH into a remote server and start or resume the tmux session there, using the iTerm v3 integration:
+
+    stmux dark
+
+Uses the session name "0", which is the default when starting a new tmux session.
+
 # tabs2spaces
 
 Replace tabs with character padding sufficient to fit all values in a given column. Reads entire stdin before outputting anything in order to measure the width of each column.

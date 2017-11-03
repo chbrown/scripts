@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+if [[ "${@---help}" =~ '--help' ]]; then
+  >&2 cat <<HELP
+Usage: stmux chbrown@dark
+
+For use with iTerm2 v3 with tmux integration.
+
+This SSH's to the indicated host in pseudo-terminal mode,
+then calls tmux with the arguments:
+  -u   Explicitly specify that UTF-8 is supported
+  -CC  Start in control mode and disable echo
+  new  Shortcut for new-session
+  -A   Attach to the named session instead of creating, if it exists
+  -s 0 Specify the session name as "0"
+HELP
+  exit 1
+fi
+
+ssh $1 -t 'tmux -u -CC new -A -s 0'

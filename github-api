@@ -71,7 +71,8 @@ def _parse_links(links_string):
      <https://api.github.com/repositories/12345/commits?page=5>; rel="last"'
     into a key-value pairs with these possible keys: next, last, first, prev
     '''
-    for link_string in re.split(r',\s*', links_string):
+    # The filter(None, ...) handles the case where links_string is the empty string
+    for link_string in filter(None, re.split(r',\s*', links_string)):
         href_string, rel_string = re.split(r';\s*', link_string)
         href_match = re.match(r'<(.+)>', href_string)
         rel_match = re.match(r'rel="(.+)"', rel_string)
@@ -81,9 +82,11 @@ def _parse_links(links_string):
 def commits(owner, repo, headers=None):
     path = '/repos/{owner}/{repo}/commits'.format(owner=owner, repo=repo)
     response = request(prepare_url(path), headers=headers, params={'per_page': 100})
-    links = dict(_parse_links(response.headers['Link']))
-    logger.info('...')
-    request(links['last'], headers=headers)
+    links = dict(_parse_links(response.headers.get('Link', '')))
+    # if there's only one page of commits, there won't be a rel="last" link
+    if 'last' in links:
+        logger.info('...')
+        request(links['last'], headers=headers)
 
 
 def contents(owner, repo, path, headers=None, params=None):

@@ -1,32 +1,35 @@
 #!/usr/bin/env python
 import os
-import sys
 from datetime import datetime
-
-# chardet is an external library (https://github.com/erikrose/chardet), available with `easy_install chardet`
+# chardet is an external library (https://github.com/erikrose/chardet),
+# available via `pip install -U chardet`
 import chardet
 
 
-def lsm(filename, out):
-    with open(filename) as fd:
+def lsm(filename):
+    with open(filename, 'rb') as fd:
         raw = fd.read()
         guess = chardet.detect(raw)
         content = raw.decode(guess['encoding'])
 
     modified = datetime.fromtimestamp(os.path.getmtime(filename))
-    print >> out, u'[%s] %s' % (modified.isoformat(' '), filename)
-    print >> out, content.encode('utf8')
+    print('[%s] %s' % (modified.isoformat(' '), filename))
+    print(content)
 
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(description='Consolidate list of text files into single document, converting to UTF-8 and recording filenames and "mtime" of the original file.',
+    parser = argparse.ArgumentParser(
+        description='Consolidate list of text files into single document, '
+                    'converting to UTF-8, and recording filenames and "mtime" '
+                    'of the original file.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('filenames', nargs='+', help='Files to read')
     opts = parser.parse_args()
 
     for filename in opts.filenames:
-        lsm(filename, sys.stdout)
+        lsm(filename)
+
 
 if __name__ == '__main__':
     main()

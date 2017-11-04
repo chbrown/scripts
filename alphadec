@@ -38,5 +38,6 @@ def main():
         # random.choices does sampling with replacement
         print(''.join(random.choices(population, k=k)))
 
+
 if __name__ == '__main__':
-    main()
+    exit(main())

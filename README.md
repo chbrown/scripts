@@ -346,11 +346,11 @@ The header filepath defaults to `~/.standardhead.html`.
 
 # md5py
 
-MD5 hash the last command line argument.
+MD5-hash each of the command line arguments.
 
     md5py freshplum
 
-_N.b._: If given a filename, this doesn't sum a file, but the filename!
+_N.b._: If given a filename, this doesn't sum the file, but the filename!
 
 # nargs
 

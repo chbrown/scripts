@@ -8,16 +8,16 @@ def bound(minimum, x, maximum):
     return min(max(x, minimum), maximum)
 
 
-def format(counts, style):
+def format_counts(counts, style):
     # counts is a list / iterable of (count, line) pairs
     if style == 'csv':
-        print 'count,value'
+        print('count,value')
         for pair in counts:
-            print ','.join(pair)
+            print(','.join(pair))
     elif style == 'tsv':
-        print 'count\tvalue'
+        print('count\tvalue')
         for pair in counts:
-            print '\t'.join(pair)
+            print('\t'.join(pair))
     else:
         # markdown
         counts = list(counts)  # we'll need it more than once
@@ -29,23 +29,27 @@ def format(counts, style):
         count_width = bound(5, count_max_len, 10)
         value_width = bound(5, value_max_len, 70)
 
-        print '| %s | %s |' % ('count'.center(count_width), 'value'.center(value_width))
+        print('| %s | %s |' % ('count'.center(count_width), 'value'.center(value_width)))
         # 2 for the gutter
-        print '|%s|%s|' % (':'.rjust(count_width + 2, '-'), ':'.ljust(value_width + 2, '-'))
+        print('|%s|%s|' % (':'.rjust(count_width + 2, '-'), ':'.ljust(value_width + 2, '-')))
         for count, value in counts:
-            print '| %s | %s |' % (count.rjust(count_width), value.ljust(value_width))
+            print('| %s | %s |' % (count.rjust(count_width), value.ljust(value_width)))
 
 
 def main():
-    parser = argparse.ArgumentParser(description='sort | uniq -c | sort -g # but with formatting',
+    parser = argparse.ArgumentParser(
+        description='sort | uniq -c | sort -g # but with formatting',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-r', '--desc', action='store_true', help='More common values first')
-    parser.add_argument('-f', '--format', choices=['tsv', 'csv', 'markdown'], help='Format', default='tsv')
-    parser.add_argument('-n', '--normalize', action='store_true', help='Normalize counts to percentages')
+    parser.add_argument('-r', '--desc', action='store_true',
+                        help='More common values first')
+    parser.add_argument('-f', '--format', choices=['tsv', 'csv', 'markdown'],
+                        help='Format', default='tsv')
+    parser.add_argument('-n', '--normalize', action='store_true',
+                        help='Normalize counts to percentages')
     opts = parser.parse_args()
 
     counter = Counter(line.rstrip() for line in sys.stdin)
-    ordered_pairs = sorted(counter.iteritems(), key=lambda pair: pair[1], reverse=opts.desc)
+    ordered_pairs = sorted(counter.items(), key=lambda pair: pair[1], reverse=opts.desc)
     # ordered_pairs is now a properly ordered list of (line, count) pairs
     if opts.normalize:
         total = float(sum(count for line, count in ordered_pairs))
@@ -53,7 +57,8 @@ def main():
     else:
         ordered_counts = [(str(count), line) for line, count in ordered_pairs]
     # ordered_counts is now a properly ordered list of (count, line) pairs
-    format(ordered_counts, opts.format)
+    format_counts(ordered_counts, opts.format)
+
 
 if __name__ == '__main__':
-    main()
+    exit(main())

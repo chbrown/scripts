@@ -39,8 +39,11 @@ def format_mac_address(octets, sep=':'):
 
 
 def generate_random_mac_address():
-    # first octet/number must be even, apparently
-    # any 48-bit number, i.e., a number between 0 and 2^48
+    '''
+    Generate 6 random bytes/octets, where the first one is even.
+    This represents a 48-bit number, i.e., a number between 0 and 2^48.
+    '''
+    # first octet/number must be even, apparently?
     return [random.randint(0, 127) * 2] + [random.randint(0, 255) for _ in range(5)]
 
 
@@ -56,9 +59,11 @@ def set_mac_address(target_mac_address):
     # check if it took
     result_mac_address = read_current_mac_address()
     if result_mac_address == target_mac_address:
-        print '%s -> %s (success)' % (format_mac_address(original_mac_address), format_mac_address(result_mac_address))
+        print('{} -> {} (success)'.format(format_mac_address(original_mac_address),
+                                          format_mac_address(result_mac_address)))
     else:
-        print '%s ! %s (failure)' % (format_mac_address(original_mac_address), format_mac_address(target_mac_address))
+        print('{} ! {} (failure)'.format(format_mac_address(original_mac_address),
+                                         format_mac_address(target_mac_address)))
         raise SystemExit(1)
 
 
@@ -66,12 +71,12 @@ def set_mac_address(target_mac_address):
 
 def generate():
     '''Print a random valid MAC address to STDOUT'''
-    print format_mac_address(generate_random_mac_address())
+    print(format_mac_address(generate_random_mac_address()))
 
 
 def info():
     '''Print the current MAC address'''
-    print format_mac_address(read_current_mac_address())
+    print(format_mac_address(read_current_mac_address()))
 
 
 def randomize():
@@ -86,16 +91,16 @@ def revert():
     set_mac_address(original_mac_address)
 
 
-# cli
-
 def main():
     actions = dict(generate=generate, info=info, randomize=randomize, revert=revert)
     uid = os.geteuid()
     default_action = 'randomize' if uid == 0 else 'info'
 
-    parser = argparse.ArgumentParser(description='Usage: Change MAC address',
+    parser = argparse.ArgumentParser(
+        description='Change/randomize/display MAC address',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('action', choices=actions, nargs='?', help='Action', default=default_action)
+    parser.add_argument('action', choices=actions, nargs='?', default=default_action,
+                        help='Action')
 
     opts = parser.parse_args()
     actions[opts.action]()

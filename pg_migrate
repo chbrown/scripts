@@ -5,7 +5,7 @@ import argparse
 
 def shell(command, verbose=False):
     if verbose:
-        print '$', command
+        print('$', command)
     return os.system(command)
 
 
@@ -31,13 +31,19 @@ def createdb(host, db, verbose):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='PostgreSQL migration development tool',
+    parser = argparse.ArgumentParser(
+        description='PostgreSQL migration development tool',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('source', help='SOURCE:DATABASE')
-    parser.add_argument('destination', help='DESTINATION:DATABASE')
-    parser.add_argument('-c', '--create', action='store_true', help='create database on destination')
-    parser.add_argument('-d', '--drop', action='store_true', help='drop database on destination')
-    parser.add_argument('-v', '--verbose', action='store_true', help='print extra output')
+    parser.add_argument('source',
+                        help='SOURCE:DATABASE')
+    parser.add_argument('destination',
+                        help='DESTINATION:DATABASE')
+    parser.add_argument('-c', '--create', action='store_true',
+                        help='create database on destination')
+    parser.add_argument('-d', '--drop', action='store_true',
+                        help='drop database on destination')
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='print extra output')
     opts = parser.parse_args()
 
     source_host, source_db = split(opts.source)
@@ -59,8 +65,10 @@ def main():
 
     retcode = shell(command, opts.verbose)
     if retcode != 0:
-        print 'You may need to create the database locally first'
-        print 'e.g.: dropdb %s; createdb %s' % (destination_db, destination_db)
+        print('You may need to create the database locally first')
+        print('e.g.: dropdb %s; createdb %s' % (destination_db, destination_db))
     return retcode
 
-exit(main())
+
+if __name__ == '__main__':
+    exit(main())

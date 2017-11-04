@@ -1,39 +1,66 @@
 #!/usr/bin/env python
 import sys
 import csv
-
-print '''
-    <style>
-        table td {
-            vertical-align: top;
-            padding: 2px;
-            border: 1px dotted #ddd;
-            border-left: 0;
-            border-top: 0;
-        }
-    </style>
-'''
-
-print '<table cellspacing="0" cellpadding="0">'
-
-with open(sys.argv[-1], 'r') as input:
-    csv_reader = csv.DictReader(input)
-
-    fieldnames = csv_reader.fieldnames
-
-    print '<tr>'
-    for fieldname in fieldnames:
-        print '<th>%s</th>' % fieldname
-    print '</tr>'
+import argparse
+import xml.etree.ElementTree as ET
 
 
-    for record in csv_reader:
-        print '<tr>'
-        for fieldname in fieldnames:
-            html = record[fieldname]
-            if html:
-                html = html.replace('\n', '<br/>')
-            print '<td>%s</td>' % html
-        print '</tr>'
+def generate_style():
+    style = ET.Element('style')
+    table_td_rules = {
+        'vertical-align': 'top',
+        'padding': '2px',
+        'border': '1px dotted #ddd',
+        'border-left': '0',
+        'border-top': '0',
+    }
+    table_td_rule_strings = [': '.join(selector_rule)
+                             for selector_rule in table_td_rules.items()]
+    style.text = '\n'.join(['table td {'] + table_td_rule_strings + ['}'])
+    return style
 
-print '</table>'
+
+def generate_tr(table, cell_values, cell_tag='td'):
+    tr = ET.SubElement(table, 'tr')
+    for cell_value in cell_values:
+        cell = ET.SubElement(tr, cell_tag)
+        cell.text = cell_value  # .replace('\n', '<br/>')
+    return tr
+
+
+def generate_table(fieldnames, records):
+    table = ET.Element('table', cellspacing='0', cellpadding='0')
+    # add header row to table
+    generate_tr(table, fieldnames, cell_tag='th')
+    # add data rows to table
+    for record in records:
+        cells = [record.get(fieldname, '') for fieldname in fieldnames]
+        generate_tr(table, cells)
+    return table
+
+
+def iter_elements(css, csvfiles):
+    if css:
+        yield generate_style()
+
+    for csvfile in csvfiles:
+        csv_reader = csv.DictReader(csvfile)
+        yield generate_table(csv_reader.fieldnames, csv_reader)
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Format a csv file as an HTML table',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--css', action='store_true',
+                        help='Print CSS styles before table(s)')
+    parser.add_argument('csvfiles', nargs='*', type=argparse.FileType('r'), default=[sys.stdin],
+                        help='Input file(s) in CSV format')
+    opts = parser.parse_args()
+
+    for element in iter_elements(opts.css, opts.csvfiles):
+        print(ET.tostring(element, encoding='unicode', method='html'))
+
+
+if __name__ == '__main__':
+    exit(main())

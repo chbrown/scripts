@@ -2,20 +2,28 @@
 import argparse
 from collections import Counter
 
-parser = argparse.ArgumentParser(description='Find lines shared by all files.',
-    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('filenames', nargs='+')
-opts = parser.parse_args()
 
-total = Counter()
+def iter_counts(files):
+    counter = Counter()
+    for file in files:
+        lines = (line.rstrip() for line in file)
+        counter.update(set(lines))
+    return counter
 
-for filename in opts.filenames:
-    with open(filename) as fp:
-        lines = (line.rstrip() for line in fp)
-        total.update(set(lines))
 
-minimum = len(opts.filenames)
+def main():
+    parser = argparse.ArgumentParser(
+        description='Find lines shared by all files.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('files', nargs='+', type=argparse.FileType('r'))
+    opts = parser.parse_args()
 
-for line, count in total.iteritems():
-    if count >= minimum:
-        print line
+    counter = iter_counts(opts.files)
+    minimum = len(opts.files)
+    for line, count in counter.items():
+        if count >= minimum:
+            print(line)
+
+
+if __name__ == '__main__':
+    exit(main())

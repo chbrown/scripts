@@ -94,16 +94,21 @@ def contents(owner, repo, path, headers=None, params=None):
     request(prepare_url(path), headers=headers, params=params)
 
 
-### CLI command funcs
+# CLI command funcs
+# =================
+
 
 def path_command(opts, headers):
     request(prepare_url(opts.path), headers=headers)
 
+
 def commits_command(opts, headers):
     commits(opts.owner, opts.repo, headers=headers)
 
+
 def contents_command(opts, headers):
     contents(opts.owner, opts.repo, opts.path, headers=headers)
+
 
 def main():
     parser = argparse.ArgumentParser(

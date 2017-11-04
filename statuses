@@ -2,44 +2,74 @@
 import argparse
 import os
 import re
-from subprocess import Popen, PIPE
-from colorama import Fore
+import subprocess
 
 committed_re = re.compile(r'^## ([-a-z]+)...origin/\1\s*$')
 
-parser = argparse.ArgumentParser(
-    description='Print statuses for a list of git repositories',
-    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('files', nargs='*', help='Git repositories')
-parser.add_argument('-v', '--verbose', action='store_true', help='Log more')
-opts = parser.parse_args()
+RESET_ALL =  '\x1b[0m'
+REVERSE =    '\x1b[7m'
+RED =        '\x1b[31m'
+GREEN =      '\x1b[32m'
+YELLOW =     '\x1b[33m'
+BLUE =       '\x1b[34m'
+MAGENTA =    '\x1b[35m'
+RESET_FORE = '\x1b[39m'
 
-filenames = [filename for filename in (opts.files or os.listdir('.')) if os.path.isdir(filename)]
 
-for filename in filenames:
-    git_process = Popen(['git', 'status', '-sb'], stdout=PIPE, stderr=PIPE, cwd=filename)
-    stdoutdata, stderrdata = git_process.communicate()
-    if git_process.returncode == 0 and committed_re.match(stdoutdata):
-        if opts.verbose:
-            print '({filename} is clean and committed)'.format(filename=filename)
+def reverse(string):
+    return REVERSE + string + RESET_ALL
+
+
+def fore(color, string):
+    return color + string + RESET_FORE
+
+
+def print_git_report(git_dir, verbose=False):
+    git_proc = subprocess.run(['git', 'status', '-sb'],
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE,
+                              cwd=git_dir,
+                              universal_newlines=True)
+    if git_proc.returncode == 0 and committed_re.match(git_proc.stdout):
+        if verbose:
+            print('({} is clean and committed)'.format(git_dir))
     else:
-        print '\x1b[7m' + filename + '\x1b[0m'
+        print(reverse(git_dir))
         # print '$?', git_process.returncode
-        if stdoutdata:
-            branch, changes = stdoutdata.split('\n', 1)
+        if git_proc.stdout:
+            branch, changes = git_proc.stdout.split('\n', 1)
             if not committed_re.match(branch):
-                print Fore.MAGENTA + branch + Fore.RESET
+                print(fore(MAGENTA, branch))
             for change in changes.split('\n'):
                 if change.startswith(' M'):
-                    print Fore.BLUE + change + Fore.RESET
+                    print(fore(BLUE, change))
                 elif change.startswith(' A'):
-                    print Fore.GREEN + change + Fore.RESET
+                    print(fore(GREEN, change))
                 elif change.startswith(' D'):
-                    print Fore.RED + change + Fore.RESET
+                    print(fore(RED, change))
                 elif change.startswith('??'):
-                    print Fore.YELLOW + change + Fore.RESET
+                    print(fore(YELLOW, change))
                 else:
-                    print change
-        if stderrdata:
-            # if opts.verbose:
-            print stderrdata
+                    print(change)
+        if git_proc.stderr:
+            # if verbose:
+            print(git_proc.stderr)
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Print statuses for a list of git repositories',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='Log extra information')
+    parser.add_argument('git_dirs', nargs='*',
+                        default=[child for child in os.listdir() if os.path.isdir(child)],
+                        help='Git repositories')
+    opts = parser.parse_args()
+
+    for git_dir in opts.git_dirs:
+        print_git_report(git_dir)
+
+
+if __name__ == '__main__':
+    exit(main())

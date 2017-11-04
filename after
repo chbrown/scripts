@@ -2,34 +2,43 @@
 import sys
 import argparse
 
-parser = argparse.ArgumentParser(description='Find all lines after the last occurrence in a file or STDIN.',
-    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('--last', action='store_true')
-parser.add_argument('pattern')
-parser.add_argument('files', nargs='*')
-opts = parser.parse_args()
 
-pattern = opts.pattern
+def after(lines, pattern):
+    found = False
+    for line in lines:
+        if found:
+            yield line
+        elif pattern in line:
+            found = True
 
-if not sys.stdin.isatty():
-    reader = sys.stdin
-else:
-    reader = (line for path in opts.files for line in open(path))
 
-if opts.last:
+def after_last(lines, pattern):
     cache = []
-    for line in reader:
+    for line in lines:
         cache.append(line)
         if pattern in line:
             cache = []
-    print ''.join(cache),
-else:
-    found = False
-    for line in reader:
-        if found:
-            print line,
-        if pattern in line:
-            found = True
+    for line in cache:
+        yield line
 
-# how to do "until" (which is easier)
-# after iteration --last | awk '/------/ { exit } { print }'
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Print all lines after the occurrence of "pattern" in a file or /dev/stdin',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--last', action='store_true',
+                        help='Only print lines after the last occurrence of "pattern" '
+                             '(potentially requires buffering the entire file)')
+    parser.add_argument('pattern',
+                        help='Fixed string pattern to search for')
+    parser.add_argument('files', nargs='*', type=argparse.FileType('r'), default=[sys.stdin],
+                        help='Input file(s)')
+    opts = parser.parse_args()
+
+    after_func = after_last if opts.last else after
+    for line in after_func((line for file in opts.files for line in file), opts.pattern):
+        print(line, end='')
+
+
+if __name__ == '__main__':
+    exit(main())

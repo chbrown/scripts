@@ -1,75 +1,83 @@
 #!/usr/bin/env node
-var os = require('os');
-var stream = require('stream');
-var streaming = require('streaming');
-var util = require('util');
+const os = require('os')
+const stream = require('stream')
+const streaming = require('streaming')
+const util = require('util')
 
-var ColumnSpacer = module.exports = function(padding, gutter) {
-  stream.Transform.call(this, {decodeStrings: false});
-  this._rows = []; // an N-long list of lists of strings (the cells)
-  this._widths = []; // an N-long list of numbers (column widths)
-  this.padding = (padding !== undefined) ? padding : ' ';
-  this.gutter = (gutter !== undefined) ? gutter : ' '; // ' | ' is GFM table style; ' ' is minimal style
-};
-util.inherits(ColumnSpacer, stream.Transform);
-ColumnSpacer.prototype._transform = function(chunk, encoding, callback) {
-  // capture the row for output later
-  var cells = chunk.toString().split(/\t/);
-  this._rows.push(cells);
-  // adjust the cell widths to fit the cells in this row
-  var self = this;
-  cells.forEach(function(cell, i) {
-    self._widths[i] = Math.max(self._widths[i] || 0, cell.length);
-  });
-  callback();
-};
-ColumnSpacer.prototype._flush = function(callback) {
-  var self = this;
-  this._rows.forEach(function(row, i) {
-    var line = row.map(function(cell, i) {
-      return self.alignRight(cell, self._widths[i]);
-    }).join(self.gutter);
-    self.push(line + os.EOL);
-  });
-  callback();
-};
-ColumnSpacer.prototype.alignLeft = function(string, width) {
-  while (string.length < width) {
-    string = this.padding + string;
+class ColumnSpacer extends stream.Transform {
+  /**
+  gutter=' | ' is GFM table style; gutter=' ' is minimal style
+  */
+  constructor(padding = ' ', gutter = ' ') {
+    super({decodeStrings: false})
+    this._rows = [] // an N-long list of lists of strings (the cells)
+    this._widths = [] // an N-long list of numbers (column widths)
+    this.padding = padding
+    this.gutter = gutter
   }
-  return string;
-};
-ColumnSpacer.prototype.alignRight = function(string, width) {
-  while (string.length < width) {
-    string = string + this.padding;
+  _transform(chunk, encoding, callback) {
+    // capture the row for output later
+    const cells = chunk.toString().split(/\t/)
+    this._rows.push(cells)
+    // adjust the cell widths to fit the cells in this row
+    cells.forEach((cell, i) => {
+      this._widths[i] = Math.max(this._widths[i] || 0, cell.length)
+    })
+    callback()
   }
-  return string;
-};
-
-var optimist = require('optimist')
-  .usage('Usage: tabs2spaces < accounts.tsv\n\nReplace tabs with padding.')
-  .describe({
-    help: 'print this help message',
-    gutter: 'string to print between each column (use " | " for Markdown)',
-    padding: 'string to pad each column',
-  })
-  .boolean(['help'])
-  .alias({help: 'h'})
-  .default({
-    gutter: ' ',
-    padding: ' ',
-  });
-
-var argv = optimist.argv;
-
-if (argv.help) {
-  optimist.showHelp();
+  _flush(callback) {
+    this._rows.forEach((row, i) => {
+      const line = row.map((cell, j) => {
+        return this.alignRight(cell, this._widths[j])
+      }).join(this.gutter)
+      this.push(line + os.EOL)
+    })
+    callback()
+  }
+  alignLeft(string, width) {
+    while (string.length < width) {
+      string = this.padding + string
+    }
+    return string
+  }
+  alignRight(string, width) {
+    while (string.length < width) {
+      string = string + this.padding
+    }
+    return string
+  }
 }
-else if (process.stdin.isTTY) {
-  throw new Error('Tab-separated values must be piped in on STDIN');
+
+function main() {
+  const optimist = require('optimist')
+    .usage(`Usage: tabs2spaces < accounts.tsv
+
+Replace tabs with normal spaces and align into tabular layout.`)
+    .describe({
+      help: 'print this help message',
+      gutter: 'string to print between each column (use " | " for Markdown)',
+      padding: 'string to pad each column',
+    })
+    .boolean(['help'])
+    .alias({help: 'h'})
+    .default({
+      gutter: ' ',
+      padding: ' ',
+    })
+
+  const argv = optimist.argv
+
+  if (argv.help) {
+    optimist.showHelp()
+  }
+  else if (process.stdin.isTTY) {
+    throw new Error('Tab-separated values must be piped in on STDIN')
+  }
+  else {
+    const lineSplitter = new streaming.Splitter()
+    const columnSpacer = new ColumnSpacer(argv.padding, argv.gutter)
+    process.stdin.pipe(lineSplitter).pipe(columnSpacer).pipe(process.stdout)
+  }
 }
-else {
-  var line_splitter = new streaming.Splitter();
-  var column_spacer = new ColumnSpacer(argv.padding, argv.gutter);
-  process.stdin.pipe(line_splitter).pipe(column_spacer).pipe(process.stdout);
-}
+
+if (require.main === module) main()

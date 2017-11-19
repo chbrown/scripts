@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+if [[ "$@" =~ '--help' ]]; then
+  >&2 cat <<HELP
+Usage: ls -d ~/.bashrc | path2name
+
+Convert a filepath into a flat filename by replacing:
+  hidden-file dots with 'dot_'
+  '~/' with 'home-'
+  leading '/' with 'root-'
+  all other '/'s and any non-portable filename characters with '-'s
+HELP
+  exit 1
+fi
+
+sed -e "s:^\.:dot_:g" -e "s:/\.:/dot_:g" -e "s:$HOME:home:g" -e "s:^/:root-:" | tr -C '\n[:alnum:]._-' -

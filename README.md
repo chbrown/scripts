@@ -372,6 +372,27 @@ Convert an OTF font file to EOT with fontforge
 
     otf2ttf2eot.sh TimesNewRoman.otf
 
+# path2name
+
+Convert a filepath into a flat filename.
+
+    ls -d ~/.bashrc | path2name
+    #=> home-dot_bashrc
+
+    ls -d /tmp/server.log | path2name
+    #=> root-tmp-server.log
+
+    ls -d Music/Audiobooks | path2name
+    #=> Music-Audiobooks
+
+| Replaces this                        | with this |
+|-------------------------------------:|:----------|
+| hidden-file dots                     | `dot_`    |
+| `~/`                                 | `home-`   |
+| leading `/`                          | `root-`   |
+| other `/` separators                 | `-`       |
+| any non-portable filename characters | `-`       |
+
 # pcol
 
 Like `col`, but auto-adjusts with more text. Slower, obviously.

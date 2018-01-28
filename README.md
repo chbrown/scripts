@@ -467,12 +467,6 @@ Uses python to construct a `ssh -C` and `pg_dump` pipeline. Options:
 * `-c` / `--create` runs `createdb` on the target host.
 
 
-# ppjson
-
-Pretty print JSON (using Python's `json.dumps`, sorting keys and indenting by two spaces):
-
-    cat Twitter/Texas_geolocated.json | ppjson
-
 # ppxml
 
 Pretty print XML using [Libxml](http://xmlsoft.org/)'s [`xmllint`](http://xmlsoft.org/xmllint.html) tool.

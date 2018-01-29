@@ -489,26 +489,6 @@ Prepend the UTF-8 byte order marker (BOM) to the input. Uses `fileinput`, so STD
 
     <flat.txt prependbom > flat.utf8
 
-# ptx
-
-Run `pdflatex` on the nearest `.tex` file, potentially specified by command line argument,
-without interaction, and then open in `TeXShop`.
-
-    ptx Brown_FinalReport.tex
-
-Or
-
-    ptx Brown_FinalReport
-
-Or
-
-    $ ls *.tex
-    Brown_FinalReport.tex     Figures.tex     Zscores.tex
-
-    $ ptx
-
-I use this in Sublime Text 2 in my `LaTeX` build system.
-
 # redis-del
 
 Do a combo redis KEYS "prefix:*" command and then DEL whatever it finds.
@@ -700,14 +680,6 @@ List the total sizes of the specified directories' children nodes, in Megabytes,
     triage Desktop Music Downloads
 
 Without arguments, defaults to the current directory, as if calling `triage .`
-
-# tx
-
-Like [`ptx`](#ptx), but with a `latex && dvipdf` pipeline instead of `pdflatex`.
-You'll probably only find this useful if you're still using `qtree` with arrows,
-in which case you really ought to check out `TikZ`.
-
-    tx so_many_trees
 
 # vimeo-crawler
 

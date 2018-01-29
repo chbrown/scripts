@@ -681,21 +681,6 @@ List the total sizes of the specified directories' children nodes, in Megabytes,
 
 Without arguments, defaults to the current directory, as if calling `triage .`
 
-# vimeo-crawler
-
-Crawl vimeo for the most popular movies under a given channel, saving to `~/Movies/vimeo`:
-
-    vimeo-crawler --channels staffpicks
-
-The destination directory is created with `os.makedirs` if it doesn't exist. See `--help` for more options.
-
-Requires `requests`, `youtube-dl`, and `redis`:
-
-    easy_install requests
-    brew install youtube-dl
-    brew install redis
-    launch redis
-
 # vsplitimg
 
 Open all files in the current folder as images, split them into half, left and right, (like opening a normal book), and save as the original filenames suffixed with `-left` or `-right`, JPEGs with quality 95.

@@ -330,20 +330,6 @@ Reset your current MAC address to a random new one:
     sudo mac.py
 
 
-## `md` (node.js)
-
-Convert Markdown to HTML and prefix with a global header.
-
-    md README.md README.html
-
-Or you can pipe Markdown into `md`. The example below dumps the HTML to a temporary file and opens it in Firefox.
-
-    pbpaste | md > /tmp/pasteboard.html
-    open -a Firefox.app /tmp/pasteboard.html
-
-The header filepath defaults to `~/.standardhead.html`.
-
-
 # md5py
 
 MD5-hash each of the command line arguments.

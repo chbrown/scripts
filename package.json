@@ -17,7 +17,6 @@
     "async": "*",
     "js-yaml": "*",
     "loge": "*",
-    "marked": "*",
     "optimist": "*",
     "streaming": "*",
     "temp": "*"

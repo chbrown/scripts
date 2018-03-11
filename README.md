@@ -89,6 +89,13 @@ Download BibTeX using [CrossRef's](https://www.crossref.org/) [content negotiati
 
     doi 10.1109/5.771073
 
+# drop
+
+Drop (delete) the first line (or `n` lines, if `n` is specified) of `/dev/stdin`.
+
+    ls -l | drop
+    ls -la | drop 3
+
 # gh
 
 Open any [GitHub](https://github.com/) pages which the current git repo has as remotes.

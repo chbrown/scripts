@@ -392,13 +392,6 @@ Like `col`, but auto-adjusts with more text. Slower, obviously.
 
     cat ANEW2010All.txt | pcol -s \\t
 
-# plprint
-
-Convert a file in Apple's "property list format" into XML (whether binary or already XML),
-then pretty print with `ppxml`. Can be supplied as a single argument, or on `/dev/stdin`.
-
-    plprint Config.plist
-
 # pdfcat
 
 Simple wrapper around Ghostscript (the `gs` binary) to read in one or more PDFs and output a PDF with the same name as the first argument, but with a `.gs.pdf` extension instead of `.pdf`.

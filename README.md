@@ -686,9 +686,17 @@ A quick `easy_install pyPdf` may be required.
 
 # wgetar
 
-`wget | tar -xz` helper. Get from url and unpackage based on extension (handles `gz` and `bz2`).
+`wget + tar -x` helper. Usage:
+
+    wgetar URL [TARGET] [-v|--verbose] [-h|--help]
+
+Use `wget` to download a tarball from `URL` and streamingly extract the contents into the `TARGET` directory
+(which defaults to the basename of `URL` without the `.tar.*` or `.t*` extension),
+decompressing based on the extension. E.g.:
 
     wgetar http://ftp.gnu.org/gnu/wget/wget-1.5.3.tar.gz
+
+The supported extensions are `.tar.gz|.tgz`, `.tar.bz2|.tbz2|.tbz`, `.tar.xz|.txz`, and `.tar.lzma|.tlzma`.
 
 # whois-domains
 

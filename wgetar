@@ -1,25 +1,88 @@
 #!/usr/bin/env bash
-URL=$1
-# -n $2 is true if $2 is non-null, -z $2 is true if $2 is null
-if [ -n "$2" ]; then
-  FILE=$2
-else
-  FILE=$(basename "$1")
+
+set -e # exit immediately on first error
+
+usage() {
+  >&2 cat <<HELP
+Usage: $(basename "$0") URL [TARGET] [-v|--verbose] [-h|--help]
+
+Use wget to download a tarball from URL and streamingly extract the contents,
+into the TARGET directory, decompressing based on the extension. E.g.:
+
+    $(basename "$0") http://ftp.gnu.org/gnu/wget/wget-1.5.3.tar.gz
+
+The supported extensions are: .tar.gz|.tgz, .tar.bz2|.tbz2|.tbz, .tar.xz|.txz, .tar.lzma|.tlzma
+
+When omitted, TARGET defaults to the basename of URL without the .tar.* or .t* extension.
+HELP
+}
+
+TAR_FLAGS=(-x)
+WGET_FLAGS=(--no-verbose --content-on-error)
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -v|--verbose)
+      >&2 printf 'Entering debug (verbose) mode.\n'
+      set -x
+      TAR_FLAGS+=(-v)
+      # this will simply overwrite the earlier (default) --no-verbose
+      WGET_FLAGS+=(--verbose)
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    # *.tar.gz|*.tgz|*.tar.bz2|*.tbz2|*.tbz|*.tar.xz|*.txz|*.tar.lzma|*.tlzma)
+    *)
+      if [[ -z ${URL+missing} ]]; then
+        # URL hasn't been set yet
+        URL=$1
+      elif [[ -z ${TARGET+missing} ]]; then
+        # TARGET hasn't been set yet
+        TARGET=$1
+      else
+        >&2 printf 'Too many arguments: "%s"\n' "$1"
+        usage
+        exit 1
+      fi
+      ;;
+  esac
+  shift
+done
+
+# Check that URL is set and exit with error message if not :(
+if [[ -z ${URL+missing} ]]; then
+  >&2 printf 'The URL argument is required.\n'
+  usage
+  exit 1
 fi
 
-EXT=${FILE##*.} # delete longest match of /.+\./ from beginning of substring (leaving last extension)
-TAR=${FILE%.$EXT} # delete (shortest) match of $EXTENSION from back of FILENAME
-FOLDER=${TAR%.tar}
+case $URL in
+  *.tar.gz|*.tgz)
+    TAR_FLAGS+=(-z)
+    ;;
+  *.tar.bz2|*.tbz2|*.tbz)
+    TAR_FLAGS+=(-j)
+    ;;
+  *.tar.xz|*.txz)
+    TAR_FLAGS+=(-J)
+    ;;
+  *.tar.lzma|*.tlzma)
+    TAR_FLAGS+=(--lzma)
+    ;;
+esac
 
-if [ $EXT = "gz" ]; then
-  FLAG='z'
-elif [ $EXT = "bz2" ]; then
-  FLAG='j'
-elif [ $EXT = "xz" ]; then
-  FLAG='x'
+URL_BASENAME=$(basename "$URL")
+
+# Check if TARGET exists and set it based on URL if not
+if [[ -z ${TARGET+missing} ]]; then
+  shopt -s extglob # ensure extended globbing is supported and enabled
+  # delete supported extensions from end (right) of URL_BASENAME
+  TARGET=${URL_BASENAME%@(.tar.gz|.tgz|.tar.bz2|.tbz2|.tbz|.tar.xz|.txz|.tar.lzma|.tlzma)}
 fi
 
-wget $URL -O $FILE
-mkdir -p $FOLDER
-tar -C $FOLDER -x -$FLAG -f $FILE
-rm $FILE
+wget "${WGET_FLAGS[@]}" -O "$URL_BASENAME" "$URL"
+mkdir -p "$TARGET"
+>&2 printf 'Extracting contents of "%s" into "%s"\n' "$URL_BASENAME" "$TARGET"
+tar "${TAR_FLAGS[@]}" -C "$TARGET" -f "$URL_BASENAME"
+rm "$URL_BASENAME"

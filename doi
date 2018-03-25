@@ -1,13 +1,125 @@
 #!/usr/bin/env bash
-if [[ "${@---help}" =~ '--help' ]]; then
-  >&2 cat <<HELP
-Usage: doi 10.1109/5.771073
 
-Download BibTeX using CrossRef's content negotiation functionality,
-then reformat with bartleby (https://github.com/chbrown/bartleby).
+# Reference: https://citation.crosscite.org/docs.html
+
+set -e # exit immediately on error
+
+ACTIONNAMES=(atom bibtex crossref json json_ld html onix rdf ris text turtle x-bibtex)
+
+usage() {
+  # 10.1109/5.771073 is a 1999 IEEE article titled "Toward unique identifiers" by Norman Paskin
+  >&2 cat <<HELP
+Usage: $(basename "$0") DOI [DOI [...]] [FORMAT [...]]
+       cat dois.txt | $(basename "$0") [DOI [...]] [FORMAT [...]]
+
+Use content negotiation to fetch information about the given DOI. E.g.:
+
+    doi 10.1109/5.771073 bibtex
+
+Supported FORMATs: ${ACTIONNAMES[*]}
+
+When bibtex is requested, reformat with bartleby (https://github.com/chbrown/bartleby).
+When json is requested, pretty-print with jq.
 HELP
+}
+
+DOIS=()
+ACTIONS=()
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    atom|bibtex|crossref|json|json_ld|html|onix|rdf|ris|text|turtle|x-bibtex)
+      ACTIONS+=("$1")
+      ;;
+    */*)
+      # DOIs have a prefix and a suffix separated by a forward slash
+      # (see https://www.doi.org/doi_handbook/1_Introduction.html#1.6.3)
+      DOIS+=("$1")
+      ;;
+    *)
+      usage
+      >&2 printf '\nUnrecognized command line argument: "%s"\n' "$1"
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+# default to the 'bibtex' action if none were specified
+if [[ ${#ACTIONS[@]} -eq 0 ]]; then
+  ACTIONS+=(bibtex)
+fi
+
+# read from STDIN and append each line to DOIS array variable
+if [[ ! -t 0 ]]; then
+  # stdin is not a terminal; we can read from it
+  while IFS= read -r DOI; do
+    DOIS+=("$DOI")
+  done
+fi
+
+# exit if we've found no DOIs to resolve
+if [[ ${#DOIS[@]} -eq 0 ]]; then
+  usage
+  >&2 printf '\nYou must supply at least one DOI\n'
   exit 1
 fi
 
-URL="https://doi.org/$1"
-curl -s -L -H "Accept: text/bibliography;style=bibtex" "$URL" | bart cat
+## define actions: a function for each format
+
+_accept() {
+  curl -s -L -H "Accept: $2" "$1"
+}
+
+atom() {
+  _accept "$1" "application/atom+xml"
+}
+bibtex() {
+  _accept "$1" "text/bibliography;style=bibtex" | bart cat
+}
+crossref() {
+  # Same as application/unixref+xml ?
+  _accept "$1" "application/vnd.crossref.unixref+xml"
+}
+json() {
+  _accept "$1" "application/vnd.citationstyles.csl+json" | jq
+}
+json_ld() {
+  _accept "$1" "application/vnd.schemaorg.ld+json"
+}
+html() {
+  curl -i -s -H "Accept: text/html" "$1" | grep '^Location:' | awk '{print $2}'
+}
+onix() {
+  _accept "$1" "application/vnd.medra.onixdoi+xml"
+}
+rdf() {
+  _accept "$1" "application/rdf+xml"
+}
+ris() {
+  _accept "$1" "application/application/x-research-info-systems"
+}
+text() {
+  _accept "$1" "text/x-bibliography"
+}
+turtle() {
+  _accept "$1" "text/turtle"
+}
+x-bibtex() {
+  _accept "$1" "application/x-bibtex"
+}
+
+## run the main loop(s)
+
+>&2 printf 'Fetching %d format(s) for %d DOI(s)\n' ${#ACTIONS[@]} ${#DOIS[@]}
+for DOI in "${DOIS[@]}"; do
+  # trim any existing URI prefix, e.g., "http://dx.doi.org/" or "https://doi.org/",
+  # then prefix with the standard one, i.e., "https://doi.org/"
+  URL=https://doi.org/$(printf '%s' "$DOI" | sed -e 's%^http://dx.doi.org/%%' -e 's%^https://doi.org/%%')
+  for ACTION in "${ACTIONS[@]}"; do
+    $ACTION "$URL"
+  done
+done

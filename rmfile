@@ -1,13 +1,19 @@
 #!/usr/bin/env bash
 
+usage() {
+  >&2 cat <<HELP
+usage: $(basename "$0") file ...
+
+$(basename "$0") is like rmdir; it only deletes a file if the file is empty.
+HELP
+}
+
 # if there are no arguments, this will default $@ to --help, so it works for all cases.
 if [[ "${@---help}" =~ '--help' ]]; then
-  if [[ "${@}" =~ '--help' ]]
-  then
-    printf "rmfile: illegal option -- -\n"
+  if [[ "${@}" =~ '--help' ]]; then
+    >&2 printf "rmfile: illegal option -- -\n"
   fi
-  printf "usage: rmfile file ...\n\n"
-  printf "rmfile is like rmdir; it only deletes a file if the file is empty.\n"
+  usage
   exit 1
 fi
 

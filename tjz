@@ -60,16 +60,20 @@ fi
 
 name="$(basename "$original")"
 # write to a temporary .tar.bz2 file first
-tmp_tar_bz2=${TMPDIR-/tmp/}$name.tar.bz2
+tmp_tarball=$(mktemp -d)/$name.tar.bz2
 # COPYFILE_DISABLE=1 ignores extended attributes (xattr) on Mac OS X
 # -C treats the parent directory as the path context
-COPYFILE_DISABLE=1 tar -cjf "$tmp_tar_bz2" -C "$(dirname "$original")" \
+COPYFILE_DISABLE=1 tar -cjf "$tmp_tarball" -C "$(dirname "$original")" \
   --exclude='.DS_Store' --exclude='._.DS_Store' "$name"
-move "$tmp_tar_bz2" "$tarball"
+move "$tmp_tarball" "$tarball"
+>&2 printf 'created "%s" from contents of "%s"\n' "$tarball" "$original"
 
-# move the original to a timestamp-suffixed location in the system TMPDIR
-original_trash="${TMPDIR-/tmp/}$name-$(date +%Y%m%dT%H%M%S)"
-# don't use move() since $original is a directory
-mv "$original" "$original_trash"
-
->&2 printf 'created "%s" and moved original to "%s"\n' "$tarball" "$original_trash"
+# use the 'trash' command if there is one
+if command -v trash >/dev/null 2>&1; then
+  >&2 printf 'trashing original...\n'
+  trash -v "$original"
+else
+  >&2 printf 'moving original to temporary directory...\n'
+  # don't use move() since $original is a directory
+  mv -v "$original" "$(mktemp -d)"
+fi

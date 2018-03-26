@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
 
+usage() {
+  >&2 cat <<HELP
+The first argument should be the name of a PostgreSQL database.
+Writes to a .sql.bz2 file in the current directory. Example:
+
+    $(basename "$0") notes
+HELP
+}
+
+# if there are no arguments, this will default $@ to --help, so it works for all cases.
 if [[ "${@---help}" =~ '--help' ]]; then
-  # if there are no arguments, this will default $@ to --help, so it works for all cases.
-  echo "The first argument should be the name of a PostgreSQL database."
-  echo "Writes to a .sql.bz2 file in the current directory"
-  echo
-  echo "  Example: pg_backup notes"
+  usage
   exit 1
 fi
 

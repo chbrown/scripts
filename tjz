@@ -4,18 +4,27 @@ set -e # exit on first command that fails
 
 usage() {
   >&2 cat <<HELP
-Usage: tjz penn-treebank-rel3/ [-h|--help]
+Usage: tjz DIRPATH[/] [-k|--keep] [-h|--help]
 
-Tarball and bzip2-compress the given directory into a [basename].tar.bz2
-archive, then move the original directory into TMPDIR.
+Tarball and bzip2-compress DIRPATH into a new file, "./DIRPATH.tar.bz2",
+then remove the original directory (using 'trash' if available; otherwise,
+moves the original directory into TMPDIR).
+
+Options:
+  -h, --help     Show this usage message.
+  -k, --keep     Keep (don't trash) the input directory.
 HELP
 }
 
+KEEP=false
 while [[ $# -gt 0 ]]; do
   case $1 in
     -h|--help)
       usage
       exit 0
+      ;;
+    -k|--keep)
+      KEEP=true
       ;;
     *)
       if [[ -z ${original+missing} ]]; then
@@ -68,12 +77,14 @@ COPYFILE_DISABLE=1 tar -cjf "$tmp_tarball" -C "$(dirname "$original")" \
 move "$tmp_tarball" "$tarball"
 >&2 printf 'created "%s" from contents of "%s"\n' "$tarball" "$original"
 
-# use the 'trash' command if there is one
-if command -v trash >/dev/null 2>&1; then
-  >&2 printf 'trashing original...\n'
-  trash -v "$original"
-else
-  >&2 printf 'moving original to temporary directory...\n'
-  # don't use move() since $original is a directory
-  mv -v "$original" "$(mktemp -d)"
+if ! $KEEP; then
+  # use the 'trash' command if there is one
+  if command -v trash >/dev/null 2>&1; then
+    >&2 printf 'trashing original...\n'
+    trash -v "$original"
+  else
+    >&2 printf 'moving original to temporary directory...\n'
+    # don't use move() since $original is a directory
+    mv -v "$original" "$(mktemp -d)"
+  fi
 fi

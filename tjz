@@ -42,23 +42,34 @@ move() {
 }
 
 # check that the given filepath exists
-[ ! -e "$original" ] && >&2 printf '%s does not exist.\n' "$original" && exit 1
+if [[ ! -e "$original" ]]; then
+  >&2 printf '"%s" does not exist.\n' "$original"
+  exit 1
+fi
+# check that it's a directory
+if [[ ! -d "$original" ]]; then
+  >&2 printf '"%s" is not a directory.\n' "$original"
+  exit 1
+fi
 # check that the eventual output does not exist
-[ -e "$original.tar.bz2" ] && >&2 printf '%s already exists, not overwriting.\n' "$original.tar.bz2" && exit 1
+tarball=$original.tar.bz2
+if [[ -e "$tarball" ]]; then
+  >&2 printf '"%s" already exists; not overwriting.\n' "$tarball"
+  exit 1
+fi
 
 name="$(basename "$original")"
 # write to a temporary .tar.bz2 file first
-tmp_tar_bz2="${TMPDIR-/tmp/}$name.tar.bz2"
+tmp_tar_bz2=${TMPDIR-/tmp/}$name.tar.bz2
 # COPYFILE_DISABLE=1 ignores extended attributes (xattr) on Mac OS X
-# treat the parent directory as the path context
+# -C treats the parent directory as the path context
 COPYFILE_DISABLE=1 tar -cjf "$tmp_tar_bz2" -C "$(dirname "$original")" \
   --exclude='.DS_Store' --exclude='._.DS_Store' "$name"
-# >&2 printf 'created %s\\n' "$tmp_tar_bz2"
-move "$tmp_tar_bz2" "$original.tar.bz2"
+move "$tmp_tar_bz2" "$tarball"
 
 # move the original to a timestamp-suffixed location in the system TMPDIR
 original_trash="${TMPDIR-/tmp/}$name-$(date +%Y%m%dT%H%M%S)"
-# don't use move since $original might be (is probably) a directory
+# don't use move() since $original is a directory
 mv "$original" "$original_trash"
 
->&2 printf 'created %s and moved original to %s\n' "$original.tar.bz2" "$original_trash"
+>&2 printf 'created "%s" and moved original to "%s"\n' "$tarball" "$original_trash"

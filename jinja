@@ -1,12 +1,18 @@
 #!/usr/bin/env python
 import sys
-import yaml
 import json
 
-# requirements: jinja2 PyYAML
+try:
+    import yaml
+except ImportError:
+    print('Please install "PyYAML" from PyPI and try again.')
+    raise
 
-from jinja2 import Environment
-jinja_env = Environment(trim_blocks=True, lstrip_blocks=True)
+try:
+    from jinja2 import Environment
+except ImportError:
+    print('Please install "Jinja2" from PyPI and try again.')
+    raise
 
 
 def main():
@@ -32,6 +38,7 @@ def main():
     except ValueError:
         context = yaml.load(context_string)
 
+    jinja_env = Environment(trim_blocks=True, lstrip_blocks=True)
     template = jinja_env.from_string(opts.template.read())
     # use special name: 'c' for context
     if isinstance(context, dict):

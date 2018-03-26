@@ -34,7 +34,11 @@ done
 
 move() {
   # if 'link' fails (e.g., due to a 'Cross-device link' error), fall back to 'mv'
-  link "$1" "$2" && unlink "$1" || mv "$1" "$2"
+  if link "$1" "$2"; then
+    unlink "$1"
+  else
+    mv "$1" "$2"
+  fi
 }
 
 # check that the given filepath exists

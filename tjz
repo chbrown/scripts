@@ -4,7 +4,7 @@ set -e # exit on first command that fails
 
 usage() {
   >&2 cat <<HELP
-Usage: tjz penn-treebank-rel3/
+Usage: tjz penn-treebank-rel3/ [-h|--help]
 
 Tarball and bzip2-compress the given directory into a [basename].tar.bz2
 archive, then move the original directory into TMPDIR.

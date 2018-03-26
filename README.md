@@ -208,8 +208,15 @@ and run it with `java`.
 Simple wrapper around [jinja2](http://jinja.pocoo.org/docs/) to render a common template with variable input.
 Not sure why the `jinja2` package doesn't provide this, at least as a `python -m ...` call.
 
-Input can be specifed as a filename, but defaults to STDIN.
+Input can be specified as a filename, but defaults to STDIN.
 It can be in either JSON or YAML format.
+
+One-line example:
+
+    jinja <(echo 'hello {{name}}') <<<'{"name":"world"}'
+    #=> hello world
+
+File-based example:
 
 `email.jinja.md` contents:
 

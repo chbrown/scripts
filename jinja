@@ -17,16 +17,17 @@ except ImportError:
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(description='Render template from JSON or YAML stream',
+    parser = argparse.ArgumentParser(
+        description='Render template from JSON or YAML stream',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('input', nargs='?', type=argparse.FileType('r'), default=sys.stdin,
-        help='JSON/YAML path (defaults to STDIN)')
+                        help='JSON/YAML path (defaults to STDIN)')
     parser.add_argument('template', type=argparse.FileType('r'),
-        help='Template path')
+                        help='Template path')
     parser.add_argument('output', nargs='?', type=argparse.FileType('w'), default=sys.stdout,
-        help='Rendered output destination (defaults to STDOUT)')
+                        help='Rendered output destination (defaults to STDOUT)')
     parser.add_argument('--verbose', action='store_true',
-        help='Log context to STDERR after parsing')
+                        help='Log context to STDERR after parsing')
     opts = parser.parse_args()
 
     # since we have to read over the context twice if our first pass at JSON parsing fails, read to string
@@ -51,7 +52,8 @@ def main():
         pprint(context, stream=sys.stderr)
 
     result = template.render(**context)
-    print result.encode('utf8')
+    print(result)
+
 
 if __name__ == '__main__':
     main()

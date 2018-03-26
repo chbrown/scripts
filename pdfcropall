@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 if [[ "${@---help}" =~ '--help' ]]; then
-  printf "Run pdfcrop on each argument, with meager (but non-zero) margins,\n"
-  printf "using pdfcrop's default output naming scheme (append -crop to basename)\n\n"
-  printf "  Example: pdfcropall paper.pdf appendices-*.pdf\n"
+  >&2 cat <<HELP
+Run pdfcrop on each argument, with meager (but non-zero) margins,
+using pdfcrop's default output naming scheme (append -crop to basename).
+For example:
+
+    $(basename "$0") paper.pdf appendices-*.pdf
+HELP
   exit 1
 fi
 

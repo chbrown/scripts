@@ -1,20 +1,21 @@
 #!/usr/bin/env bash
 
-# SCRIPT_NAME will be 'prefix', presumably
-SCRIPT_NAME="$(basename "$0")"
+usage() {
+  >&2 cat <<HELP
+Prefix file(s) with a string or timestamp
+Optional arguments are set via environment variables:
+  PATTERN: a strftime compatible format (defaults to %Y%m%d-)
+
+Examples:
+  PATTERN=%Y%m%d-%H%M%S- $(basename "$0") IMG_7669.jpg
+    prefix a file with a full timestamp rather than just the date
+  PATTERN=\$(date +%Y%m%d)- $(basename "$0") IMG_7669.jpg
+    prefix a file with the date at time of execution, rather than the date of the file
+HELP
+}
 
 if [[ "${@---help}" =~ '--help' ]]; then
-  printf "Prefix file(s) with a string or timestamp\n"
-  printf "Optional arguments are set via environment variables:\n"
-  # printf escapes % via doubling
-  printf "  PATTERN: a strftime compatible format (defaults to %%Y%%m%%d-)\n"
-  # printf "  : a strftime compatible format\n"
-  printf "\n"
-  printf "Examples:\n"
-  printf "  PATTERN=%%Y%%m%%d-%%H%%M%%S- %s IMG_7669.jpg\n" "$SCRIPT_NAME"
-  printf "    prefix a file with a full timestamp rather than just the date\n"
-  printf "  PATTERN=\$(date +%%Y%%m%%d)- %s IMG_7669.jpg\n" "$SCRIPT_NAME"
-  printf "    prefix a file with the date at time of execution, rather than the date of the file\n"
+  usage
   exit 1
 fi
 

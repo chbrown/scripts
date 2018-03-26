@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-printf "%d\n" $#
+printf '%d\n' $#

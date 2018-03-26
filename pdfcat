@@ -15,4 +15,4 @@ OUTPUT="${1%.pdf}.gs.pdf"
 # The -o option implies the -dBATCH and -dNOPAUSE options.
 gs -q -sDEVICE=pdfwrite -o "$OUTPUT" "$@"
 
-printf "pdfcat: read %d PDFs and wrote gs output to %s\n" $# "$OUTPUT"
+printf 'pdfcat: read %d PDFs and wrote gs output to %s\n' $# "$OUTPUT"

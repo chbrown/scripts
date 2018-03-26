@@ -21,20 +21,20 @@ fi
 version=$2
 args=(${@:3})
 
->&2 printf "Executing artifact: %s/%s %s with args: %s\n" $groupId $artifactId $version "${args[*]}"
+>&2 printf 'Executing artifact: %s/%s %s with args: %s\n' $groupId $artifactId $version "${args[*]}"
 
 # replace dots in the groupId with slashes to generate the right path
 jar=~/.m2/repository/${groupId//.//}/$artifactId/$version/$artifactId-$version.jar
->&2 printf "Using jar: %s\n" $jar
+>&2 printf 'Using jar: %s\n' $jar
 if [[ ! -e $jar ]]; then
   mvn -DgroupId=$groupId -DartifactId=$artifactId -Dversion=$version dependency:get
 fi
 
 mainClass=$(unzip -p $jar META-INF/MANIFEST.MF | sed -n 's/^Main-Class: \([^[:space:]]*\).*$/\1/p')
 if [[ -z "$mainClass" ]]; then
-  >&2 printf "Could not find Main-Class value in JAR manifest"
+  >&2 printf 'Could not find Main-Class value in JAR manifest\n'
   exit 65 # EX_DATAERR "data format error"
 fi
->&2 printf "Executing (main) class %s\n" $mainClass
+>&2 printf 'Executing (main) class %s\n' $mainClass
 classPath=$(mvn -f ${jar/%jar/pom} dependency:build-classpath | grep -v INFO)
 java -cp $classPath:$jar $mainClass "${args[@]}"

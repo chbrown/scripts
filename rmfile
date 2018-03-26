@@ -11,7 +11,7 @@ HELP
 # if there are no arguments, this will default $@ to --help, so it works for all cases.
 if [[ "${@---help}" =~ '--help' ]]; then
   if [[ "${@}" =~ '--help' ]]; then
-    >&2 printf "rmfile: illegal option -- -\n"
+    >&2 printf 'rmfile: illegal option -- -\n'
   fi
   usage
   exit 1
@@ -20,7 +20,7 @@ fi
 EXITCODE=0
 
 print_error() {
-  printf "rmfile: %s\n" "$1"
+  printf 'rmfile: %s\n' "$1"
   EXITCODE=1
 }
 

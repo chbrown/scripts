@@ -34,10 +34,10 @@ for FILE in "$@"; do
     TARGET="$(dirname "$FILE")/$PREFIX$(basename "$FILE")"
     # vulnerable to race condition but whatever, 'mv -n source target' is apparently non-standard (as is -v)
     if [ -e "$TARGET" ]; then
-      >&2 printf "Failed to prefix '%s'; '%s' already exists\n" "$(basename "$FILE")" "$(basename "$TARGET")"
+      >&2 printf 'Failed to prefix "%s"; "%s" already exists\n' "$(basename "$FILE")" "$(basename "$TARGET")"
       EXITCODE=1
     else
-      >&2 printf "mv %s %s\n" "$(basename "$FILE")" "$(basename "$TARGET")"
+      >&2 printf 'mv %s %s\n' "$(basename "$FILE")" "$(basename "$TARGET")"
       mv "$FILE" "$TARGET"
       mv_exit_status=$?
       if [[ $mv_exit_status -ne 0 ]]; then

@@ -15,7 +15,7 @@ FILEPATH="${@: -1}"
 # call with two arguments: an exit code and an error message
 exit_if_nonzero() {
   if [[ $1 -ne 0 ]]; then
-    >&2 printf "jqi %s: %s\n" "$FILEPATH" "$2"
+    >&2 printf 'jqi %s: %s\n' "$FILEPATH" "$2"
     exit $1
   fi
 }

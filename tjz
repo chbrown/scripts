@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+
+set -e # exit on first command that fails
+
 if [[ "${@---help}" =~ '--help' ]]; then
   >&2 cat <<HELP
 Usage: tjz penn-treebank-rel3/
@@ -13,8 +16,6 @@ move() {
   # if 'link' fails (e.g., due to a 'Cross-device link' error), fall back to 'mv'
   link "$1" "$2" && unlink "$1" || mv "$1" "$2"
 }
-
-set -e # exit on first command that fails
 
 # remove trailing slash (hopefully there's only one)
 original="${1%/}"

@@ -31,7 +31,8 @@ Except for following files, I am the sole author of all of these scripts.
 
 # active
 
-Remove inactive lines; i.e., lines that are empty, whitespace-only, or where the first non-whitespace character is `#` (which is the usual comment indicator).
+Remove inactive lines; i.e., lines that are empty, whitespace-only, or comments.
+Comments are where the first non-whitespace character/string is `#`, `//`, or `--`.
 
     cat /etc/hosts | active
 

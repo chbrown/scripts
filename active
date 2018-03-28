@@ -3,5 +3,7 @@
 /^[[:blank:]]*#/d
 # delete lines beginning with: //
 /^[[:blank:]]*\/\//d
+# delete lines beginning with: --
+/^[[:blank:]]*--/d
 # delete empty lines
 /^[[:blank:]]*$/d

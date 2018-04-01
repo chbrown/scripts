@@ -619,12 +619,6 @@ Which renders into this:
 | 22171 | p     |
 | 22759 | s     |
 
-# taken
-
-Like whois-domains, take a list of domains, separated by newlines, and query whois for availability, caching in redis.
-
-    echo henrian.com | taken
-
 # tnls
 
 List all active ssh tunnels, looking for something like `ssh ... -L ...`.
@@ -705,17 +699,6 @@ decompressing based on the extension. E.g.:
     wgetar http://ftp.gnu.org/gnu/wget/wget-1.5.3.tar.gz
 
 The supported extensions are `.tar.gz|.tgz`, `.tar.bz2|.tbz2|.tbz`, `.tar.xz|.txz`, and `.tar.lzma|.tlzma`.
-
-# whois-domains
-
-1. Extract all strings that look something like domain names from the supplied files (uses Python's `fileinput`)
-2. Fetch all the whois records using the command line `whois`
-3. Cache raw whois results in Redis (using the bucket prefix `whois:`) because `whois` servers are finicky. If some whois request times out or the program crashes, simply restart the script and it will resume where it left off.
-4. Extract the expiration date from the whois records and list them all, ordered from soonest expiration to most distant.
-
-```bash
-whois-domains ~/domains.yaml
-```
 
 # yaml2json
 

@@ -1,40 +1,37 @@
 #!/usr/bin/env node
-var fs = require('fs');
-var streaming = require('streaming');
-var js_yaml = require('js-yaml');
+const streaming = require('streaming')
+const js_yaml = require('js-yaml')
 
-var optimist = require('optimist')
-  .usage([
-    'Usage: json2yaml < data.json',
-    '',
-    'Convert a JSON file to YAML',
-  ].join('\n'))
-  .describe({
-    help: 'print this help message',
-  })
-  .boolean(['help'])
-  .alias({help: 'h'});
+const optimist = require('optimist')
+.usage(`Usage: json2yaml < data.json
 
-var argv = optimist.argv;
+Convert a JSON file to YAML`)
+.describe({
+  help: 'print this help message',
+})
+.boolean(['help'])
+.alias({help: 'h'})
 
-var convert = function(stream, callback) {
+const argv = optimist.argv
+
+const convert = function(stream, callback) {
   streaming.readToEnd(stream, function(err, chunks) {
-    var json = Buffer.concat(chunks);
-    var obj = JSON.parse(json);
-    var yaml = js_yaml.dump(obj);
-    console.log(yaml);
-    callback();
-  });
-};
+    const json = Buffer.concat(chunks)
+    const obj = JSON.parse(json)
+    const yaml = js_yaml.dump(obj)
+    console.log(yaml)
+    callback()
+  })
+}
 
 if (argv.help) {
-  optimist.showHelp();
+  optimist.showHelp()
 }
 else if (process.stdin.isTTY) {
-  throw new Error('JSON must be piped in on STDIN');
+  throw new Error('JSON must be piped in on STDIN')
 }
 else {
   convert(process.stdin, function(err) {
-    if (err) throw err;
-  });
+    if (err) throw err
+  })
 }

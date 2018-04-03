@@ -1,21 +1,27 @@
 #!/usr/bin/env node
-const streaming = require('streaming')
 const js_yaml = require('js-yaml')
-
 const optimist = require('optimist')
+
+const argparser = optimist
 .usage(`Usage: json2yaml < data.json
 
 Convert a JSON file to YAML`)
-.describe({
-  help: 'print this help message',
-})
+.describe({help: 'print this help message'})
 .boolean(['help'])
 .alias({help: 'h'})
 
-const argv = optimist.argv
+const argv = argparser.argv
 
-const convert = function(stream, callback) {
-  streaming.readToEnd(stream, function(err, chunks) {
+function readToEnd(stream, callback) {
+  const chunks = []
+  return stream
+  .on('error', callback)
+  .on('data', chunk => chunks.push(chunk))
+  .on('end', () => callback(null, chunks))
+}
+
+function convert(stream, callback) {
+  readToEnd(stream, (err, chunks) => {
     const json = Buffer.concat(chunks)
     const obj = JSON.parse(json)
     const yaml = js_yaml.dump(obj)
@@ -25,7 +31,7 @@ const convert = function(stream, callback) {
 }
 
 if (argv.help) {
-  optimist.showHelp()
+  argparser.showHelp()
 }
 else if (process.stdin.isTTY) {
   throw new Error('JSON must be piped in on STDIN')

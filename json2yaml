@@ -2,16 +2,6 @@
 const js_yaml = require('js-yaml')
 const optimist = require('optimist')
 
-const argparser = optimist
-.usage(`Usage: json2yaml < data.json
-
-Convert a JSON file to YAML`)
-.describe({help: 'print this help message'})
-.boolean(['help'])
-.alias({help: 'h'})
-
-const argv = argparser.argv
-
 function readToEnd(stream, callback) {
   const chunks = []
   return stream
@@ -30,14 +20,30 @@ function convert(inputStream, outputStream, callback) {
   })
 }
 
-if (argv.help) {
-  argparser.showHelp()
+function main() {
+  const argparser = optimist
+  .usage(`Usage: json2yaml < data.json
+
+  Convert a JSON file to YAML`)
+  .describe({help: 'print this help message'})
+  .boolean(['help'])
+  .alias({help: 'h'})
+
+  const argv = argparser.argv
+
+  if (argv.help) {
+    argparser.showHelp()
+  }
+  else if (process.stdin.isTTY) {
+    throw new Error('JSON must be piped in on STDIN')
+  }
+  else {
+    convert(process.stdin, process.stdout, err => {
+      if (err) throw err
+    })
+  }
 }
-else if (process.stdin.isTTY) {
-  throw new Error('JSON must be piped in on STDIN')
-}
-else {
-  convert(process.stdin, process.stdout, err => {
-    if (err) throw err
-  })
+
+if (require.main === module) {
+  main()
 }

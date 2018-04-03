@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const js_yaml = require('js-yaml')
+const {safeDump} = require('js-yaml')
 const optimist = require('optimist')
 
 function readToEnd(stream, callback) {
@@ -15,7 +15,7 @@ function convert(inputStream, outputStream, callback) {
     if (err) return callback(err)
     const inputString = Buffer.concat(inputChunks).toString()
     const object = JSON.parse(inputString)
-    const outputString = js_yaml.dump(object)
+    const outputString = safeDump(object)
     outputStream.write(outputString, callback)
   })
 }

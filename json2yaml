@@ -20,13 +20,13 @@ function readToEnd(stream, callback) {
   .on('end', () => callback(null, chunks))
 }
 
-function convert(stream, callback) {
-  readToEnd(stream, (err, chunks) => {
-    const json = Buffer.concat(chunks)
-    const obj = JSON.parse(json)
-    const yaml = js_yaml.dump(obj)
-    console.log(yaml)
-    callback()
+function convert(inputStream, outputStream, callback) {
+  readToEnd(inputStream, (err, inputChunks) => {
+    if (err) return callback(err)
+    const inputString = Buffer.concat(inputChunks).toString()
+    const object = JSON.parse(inputString)
+    const outputString = js_yaml.dump(object)
+    outputStream.write(outputString, callback)
   })
 }
 
@@ -37,7 +37,7 @@ else if (process.stdin.isTTY) {
   throw new Error('JSON must be piped in on STDIN')
 }
 else {
-  convert(process.stdin, function(err) {
+  convert(process.stdin, process.stdout, err => {
     if (err) throw err
   })
 }

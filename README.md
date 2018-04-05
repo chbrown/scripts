@@ -288,18 +288,6 @@ Is equivalent to:
 
 If you want to run a stream of JSON through a file without having to handle the JSON conversion on each side, try [jsed](https://github.com/chbrown/jsed), which was spun out of this script.
 
-# json2yaml
-
-YAML is a superset of JSON, so there are lots of ways to convert JSON to YAML. I say, one is better than none.
-
-    json2yaml < package.json
-    > name: scripts
-    > version: 0.2.0
-    > description: Handy scripts
-    > keywords:
-    >   - scripts
-    > ...
-
 # launch
 
 Simply grep for a Mac LaunchAgent that matches the given argument, and start it. Easy way to have databases around but not always use them when not developing.
@@ -699,12 +687,6 @@ decompressing based on the extension. E.g.:
     wgetar http://ftp.gnu.org/gnu/wget/wget-1.5.3.tar.gz
 
 The supported extensions are `.tar.gz|.tgz`, `.tar.bz2|.tbz2|.tbz`, `.tar.xz|.txz`, and `.tar.lzma|.tlzma`.
-
-# yaml2json
-
-Read in YAML and output JSON.
-
-    cat simple_spec.yaml | yaml2json | jq . > simple_spec.json
 
 # zipf
 

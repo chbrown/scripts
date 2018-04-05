@@ -15,7 +15,6 @@
   "license": "MIT",
   "dependencies": {
     "async": "*",
-    "js-yaml": "*",
     "loge": "*",
     "optimist": "*",
     "streaming": "*",

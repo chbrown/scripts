@@ -194,16 +194,6 @@ Collect the lines that all specified files share:
 
 Each file is `uniq`ed, trailing whitespace is discarded, and output order is unspecified.
 
-# javaexec
-
-Fetch the specified Java package and all its dependencies (if needed),
-then determine the main class for that package,
-prepare the full classpath of dependencies,
-and run it with `java`.
-
-    javaexec org.apache.pdfbox/pdfbox-app 2.0.7 ExtractText -console Book.pdf
-    javaexec bartleby 0.7.2 cat Bibliography.bib
-
 # jinja
 
 Simple wrapper around [jinja2](http://jinja.pocoo.org/docs/) to render a common template with variable input.

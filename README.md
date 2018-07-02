@@ -601,19 +601,6 @@ Which renders into this:
 
 List all active ssh tunnels, looking for something like `ssh ... -L ...`.
 
-# tgz
-
-Wrapper around `tar cz`, basically:
-
-    tar -czf $1.tgz $1
-    mv $1 $1.tmp
-
-But with some existing / missing checks.
-
-Use like:
-
-    tgz penn-treebank-rel3/
-
 # tjz
 
 Run `tar cj` and move the original into `/tmp`:

@@ -32,7 +32,14 @@ while [[ $# -gt 0 ]]; do
       PREFIX=%Y%m%d-
       ;;
     *)
-      if [[ -z ${original+missing} ]]; then
+      # check that the given filepath exists and that it's a directory
+      if [[ ! -e $1 ]]; then
+        >&2 printf '"%s" does not exist.\n' "$1"
+        exit 1
+      elif [[ ! -d $1 ]]; then
+        >&2 printf '"%s" is not a directory.\n' "$1"
+        exit 1
+      elif [[ -z ${original+missing} ]]; then
         # original hasn't been set yet; set it while removing
         # the trailing slash (hopefully there's only one)
         original=${1%/}
@@ -54,17 +61,6 @@ move() {
     mv "$1" "$2"
   fi
 }
-
-# check that the given filepath exists
-if [[ ! -e "$original" ]]; then
-  >&2 printf '"%s" does not exist.\n' "$original"
-  exit 1
-fi
-# check that it's a directory
-if [[ ! -d "$original" ]]; then
-  >&2 printf '"%s" is not a directory.\n' "$original"
-  exit 1
-fi
 
 tarball=$original.tar.bz2
 # add prefix to tarball name if PREFIX is set

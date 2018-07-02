@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
-if [[ "$@" =~ '--help' ]]; then
+
+usage() {
   >&2 cat <<HELP
-Usage: ls -d ~/.bashrc | path2name
+Usage: ls -d ~/.bashrc | $(basename "$0")
+       $(basename "$0") /tmp/service.log
 
 Convert a filepath into a flat filename by replacing:
   hidden-file dots with 'dot_'
@@ -9,7 +11,46 @@ Convert a filepath into a flat filename by replacing:
   leading '/' with 'root-'
   all other '/'s and any non-portable filename characters with '-'s
 HELP
+}
+
+ARGS=()
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      ARGS+=("$1")
+      ;;
+  esac
+  shift
+done
+
+# read from STDIN if it is not a terminal and append each line to the ARGS array variable
+if [[ ! -t 0 ]]; then
+  # stdin ; we can read from it
+  while IFS= read -r ARG; do
+    ARGS+=("$ARG")
+  done
+fi
+
+# exit if we've found no paths to resolve
+if [[ ${#ARGS[@]} -eq 0 ]]; then
+  usage
+  >&2 printf '\nYou must supply at least one path\n'
   exit 1
 fi
 
-sed -e "s:^\.:dot_:g" -e "s:/\.:/dot_:g" -e "s:$HOME:home:g" -e "s:^/:root-:" | tr -C '\n[:alnum:]._-' -
+path2name() {
+  printf "%s" "$1" \
+  | sed -e 's:^\.:dot_:g' \
+        -e 's:/\.:/dot_:g' \
+        -e "s:$HOME:home:g" \
+        -e 's:^/:root-:' \
+  | tr -C '\n[:alnum:]._-' -
+}
+
+for ARG in "${ARGS[@]}"; do
+  path2name "$ARG"
+done

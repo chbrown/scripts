@@ -4,17 +4,17 @@ set -e # exit on first command that fails
 
 usage() {
   >&2 cat <<HELP
-Usage: tjz DIRPATH[/] [-k|--keep] [-h|--help]
+Usage: $(basename "$0") DIRPATH[/] [-k|--keep] [-p|--prefix] [-h|--help]
 
 Tarball and bzip2-compress DIRPATH into a new file, "./DIRPATH.tar.bz2",
 then remove the original directory (using 'trash' if available; otherwise,
-moves the original directory into TMPDIR).
+moves the original directory into \$TMPDIR).
 
 Options:
-  -h, --help     Show this usage message.
-  -k, --keep     Keep (don't trash) the input directory.
-  -p, --prefix   Prefix the created tarball with the original directory's
-                 date-of-birth, using the pattern "YYYYMMDD-"
+  -h, --help    Show this usage message
+  -k, --keep    Keep (don't trash) the input directory
+  -p, --prefix  Prefix the created tarball with the original directory's
+                date-of-birth, using the pattern "YYYYMMDD-"
 HELP
 }
 

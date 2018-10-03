@@ -378,32 +378,6 @@ Like `col`, but auto-adjusts with more text. Slower, obviously.
 
     cat ANEW2010All.txt | pcol -s \\t
 
-# pdfcat
-
-Simple wrapper around Ghostscript (the `gs` binary) to read in one or more PDFs and output a PDF with the same name as the first argument, but with a `.gs.pdf` extension instead of `.pdf`.
-This is useful with large PDFs, or copy-protected PDFs, etc., where you just want a plain, simple, efficient, no-nonsense PDF to work from.
-
-    pdfcat chap1.pdf chap2.pdf chap2.pdf
-
-# pdfcount
-
-Just pipes `pdftotext` (comes with LaTeX, I think) through `wc -w`:
-
-    pdfcount LSA.pdf
-
-# pdfcropall
-
-Given a list of PDFs, run `pdfcrop` on all of them with meager (but non-zero) margins, letting `pdfcrop` rename them as it likes.
-
-    pdfcropall Readings/2011-10-02/*.pdf
-
-# pdfstamp
-
-Watermark only the first page of a PDF with another PDF.
-
-    pdfstamp Chomsky_2012.pdf fair_use.pdf
-
-
 ## `pof` (bash)
 
 Lists all file descriptors open by the current shell, excluding regular files.
@@ -642,14 +616,6 @@ Open all files in the current folder as images, split them into half, left and r
     vsplitimg *.jpg
 
 Requires `PIL`: `brew install PIL` or `pip install -U PIL` if you're feeling optimistic
-
-# vsplitpdf
-
-Using `pyPdf`, open up a PDF, cropping the left and right sides right down the middle, into left and right. Create a new PDF with these crops.
-
-    vsplitpdf reconstruction.pdf
-
-A quick `easy_install pyPdf` may be required.
 
 # wgetar
 

@@ -14,11 +14,13 @@ def mkdir_p(path):
 
 
 def sh(args):
-    print '$ %s' % ' '.join(args)
+    print('$ %s' % ' '.join(args))
     subprocess.check_output(args)
 
+
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='SSHFS setup tool.',
+    parser = argparse.ArgumentParser(
+        description='SSHFS setup tool.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('remote')
     parser.add_argument('local', nargs='?')
@@ -29,6 +31,3 @@ if __name__ == '__main__':
     mkdir_p(local)
 
     sh(['sshfs', opts.remote, local])
-
-# rec for speeding up:
-# sshfs -o workaround=nodelaysrv -o cache_stat_timeout=600 -o uid=1000 -o idmap=user -o Ciphers=arcfour $1:/$2 /home/bluszcz/servers/$1

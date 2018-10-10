@@ -10,7 +10,7 @@ import redis
 # ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 # ssh.connect('dark')
 # stdin, stdout, stderr = ssh.exec_command('redis-cli ')
-# print stdout.read()
+# print(stdout.read())
 # ssh.close()
 
 host = 'dark'
@@ -24,9 +24,9 @@ local = redis.StrictRedis()
 keys = remote.keys(key_expression)
 values = remote.mget(keys)
 # args = [item for sublist in  for item in sublist]
-# print args
-local.mset(dict(zip(keys, values)))
+# print(args)
+local.mset(dict(list(zip(keys, values))))
 
 p.terminate()
 
-print 'Done'
+print('Done')

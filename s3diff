@@ -2,25 +2,26 @@
 import re
 import os
 import argparse
-from colorama import Fore  # , Back, Style
-import ConfigParser
-import boto
 import hashlib
 import logging
+import ConfigParser
+from colorama import Fore  # , Back, Style
+import boto
 
 
 # tree data structure definition (abstract, not intended to be instantiated directly)
 class Node(object):
-    has_children = False
-    has_checksum = False
-    root = None
-    key = None
     '''
     Nodes each have a key (empty / None for the root).
         In addition to the key:
             * They either have children (which must be Nodes)
             * Or a checksum
     '''
+    has_children = False
+    has_checksum = False
+    root = None
+    key = None
+
     def __eq__(left, right):
         '''Returns True if self and other are equal.'''
         assert isinstance(right, Node), 'Other must also be a Node'
@@ -33,10 +34,10 @@ class Node(object):
             checksums_equal = left.checksum == right.checksum
             if checksums_equal:
                 logging.info('%s[checksums] left = right = %s%s',
-                    Fore.GREEN, right.checksum, Fore.RESET)
+                             Fore.GREEN, right.checksum, Fore.RESET)
             else:
-                logging.warn('%s[checksums] left = %s, right = %s%s',
-                    Fore.RED, left.checksum, right.checksum, Fore.RESET)
+                logging.warning('%s[checksums] left = %s, right = %s%s',
+                                Fore.RED, left.checksum, right.checksum, Fore.RESET)
             tests += [checksums_equal]
 
         if left.has_children and right.has_children:
@@ -48,17 +49,17 @@ class Node(object):
 
             left_only = left_keys - right_keys
             right_only = right_keys - left_keys
-            tests += [len(left_only) == 0, len(right_only) == 0]
-            if len(left_only) > 0:
-                logging.warn('%sleft excess keys: %s%s', Fore.BLUE, ' '.join(left_only), Fore.RESET)
-            if len(right_only) > 0:
-                logging.warn('%sright excess keys: %s%s', Fore.BLUE, ' '.join(right_only), Fore.RESET)
+            tests += [left_only, right_only]
+            if left_only:
+                logging.warning('%sleft excess keys: %s%s', Fore.BLUE, ' '.join(left_only), Fore.RESET)
+            if right_only:
+                logging.warning('%sright excess keys: %s%s', Fore.BLUE, ' '.join(right_only), Fore.RESET)
 
             shared_keys = left_keys & right_keys
             child_tests = [left_children[key] == right_children[key] for key in shared_keys]
             tests += child_tests
 
-        if len(tests) == 0:
+        if not tests:
             logging.error('%sequality could not be determined%s', Fore.RED, Fore.RESET)
 
         return all(tests)
@@ -128,13 +129,13 @@ def resolve_uri_to_node(uri, s3_connection):
         # coerce to Prefix
         path = boto.s3.prefix.Prefix(bucket, root)
         return S3Node(bucket, path)
-    else:
-        # root = uri.rstrip('/') + '/'
-        return FSNode(uri)
+    # root = uri.rstrip('/') + '/'
+    return FSNode(uri)
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Compare S3 and local files',
+    parser = argparse.ArgumentParser(
+        description='Compare S3 and local files',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('left')
     parser.add_argument('right')

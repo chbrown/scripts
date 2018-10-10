@@ -2,15 +2,15 @@
 import os
 import sys
 import shutil
-import psutil
 import hashlib
-
 import logging
+import psutil
+
 logging.basicConfig(format="%(levelname)-7s %(message)s")
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('smv')
 
 
-def md5(filepath, block_multiplier=1024):
+def md5sum(filepath, block_multiplier=1024):
     '''Get the MD5 hexdigest for the given file, using pure python
     md5.block_size = 64 on my Macbook Air
     So when block_multiplier = 1024, md5.block_size*block_multiplier = 65536
@@ -35,26 +35,25 @@ def identical_files(source, destination):
         # 2. check size
         if os.path.getsize(source) == os.path.getsize(destination):
             # 3. check hash
-            if md5(source) == md5(destination):
+            if md5sum(source) == md5sum(destination):
                 return True
     return False
 
 
 def copy(source, destination, force=True):
     if force:
-        logger.warn('cp -f %s %s', source, destination)
+        logger.warning('cp -f %s %s', source, destination)
         shutil.copy(source, destination)
         # double check
         return identical_files(source, destination)
-    elif identical_files(source, destination):
-        logger.warn('%s == %s', source, destination)
+    if identical_files(source, destination):
+        logger.warning('%s == %s', source, destination)
         return True
-    else:
-        logger.error('%s != %s', source, destination)
-        logger.warn('cp %s %s', source, destination)
-        shutil.copy(source, destination)
-        # double check
-        return identical_files(source, destination)
+    logger.error('%s != %s', source, destination)
+    logger.warning('cp %s %s', source, destination)
+    shutil.copy(source, destination)
+    # double check
+    return identical_files(source, destination)
 
 
 def get_open_filepaths():
@@ -62,28 +61,35 @@ def get_open_filepaths():
     for proc in psutil.get_process_list():
         try:
             paths += [openfile.path for openfile in proc.get_open_files()]
-        except (psutil.AccessDenied, psutil.NoSuchProcess), exc:
+        except (psutil.AccessDenied, psutil.NoSuchProcess) as exc:
             logger.debug('psutil exception: %s', exc)
     return paths
 
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(description='Like scp but remove the files after copying',
+    parser = argparse.ArgumentParser(
+        description='Like scp but remove the files after copying',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('sources', nargs='+', help='Source files')
-    parser.add_argument('destination', help='Destination')
-    parser.add_argument('--open', action='store_true', help='Move open files')
-    parser.add_argument('--delete', action='store_true', help='Delete files after moving them')
-    parser.add_argument('--force', action='store_true', help='Replace existing files on the remote even if they match')
-    parser.add_argument('-v', '--verbose', action='store_true', help='Print extra output (like debug messages)')
+    parser.add_argument('sources', nargs='+',
+                        help='Source files')
+    parser.add_argument('destination',
+                        help='Destination')
+    parser.add_argument('--open', action='store_true',
+                        help='Move open files')
+    parser.add_argument('--delete', action='store_true',
+                        help='Delete files after moving them')
+    parser.add_argument('--force', action='store_true',
+                        help='Replace existing files on the remote even if they match')
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='Print extra output (like debug messages)')
 
     opts = parser.parse_args()
 
     logger.setLevel(logging.INFO if opts.verbose else logging.WARN)
     logger.debug('opts: %s', vars(opts))
 
-    open_filenames = set([os.path.basename(filepath) for filepath in get_open_filepaths()])
+    open_filenames = {os.path.basename(filepath) for filepath in get_open_filepaths()}
 
     if (len(opts.sources) > 1 or opts.destination.endswith('/')) and not os.path.isdir(opts.destination):
         # if there is more than one source, the destination must be a directory
@@ -105,7 +111,7 @@ def main():
                 counts['copied'] += 1
                 logger.info('%s == %s', source, destination)
                 if opts.delete:
-                    logger.warn('rm %s', source)
+                    logger.warning('rm %s', source)
                     os.remove(source)
                     counts['deleted'] += 1
             else:
@@ -117,6 +123,7 @@ def main():
     logger.info('counts: %s', counts)
     if counts['failed'] > 0:
         sys.exit(1)
+
 
 if __name__ == '__main__':
     main()

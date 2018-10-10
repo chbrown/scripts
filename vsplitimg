@@ -5,11 +5,14 @@ import argparse
 # from PIL:
 import Image
 
-parser = argparse.ArgumentParser(description='Image cropper (uses PIL)',
+parser = argparse.ArgumentParser(
+    description='Image cropper (uses PIL)',
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('filepaths', nargs='+')
-parser.add_argument('-d', '--destination', help='Destination directory (defaults to same directory as input files)')
-parser.add_argument('-q', '--quality', type=int, default=95, help='Default quality in JPG output')
+parser.add_argument('-d', '--destination',
+                    help='Destination directory (defaults to same directory as input files)')
+parser.add_argument('-q', '--quality', type=int, default=95,
+                    help='Default quality in JPG output')
 
 opts = parser.parse_args()
 
@@ -29,7 +32,7 @@ for original_filepath in opts.filepaths:
     left_path = re.sub(r'(\.\w{2,5})$', r'-left\1', split_filepath)
     right_path = re.sub(r'(\.\w{2,5})$', r'-right\1', split_filepath)
 
-    print '%s -> [%s, %s]' % (original_filepath, left_path, right_path)
+    print('%s -> [%s, %s]' % (original_filepath, left_path, right_path))
     # we would like to save with the same jpeg quantization table, but that's really hard, apparently
     left.save(left_path, quality=opts.quality)
     right.save(right_path, quality=opts.quality)

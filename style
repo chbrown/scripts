@@ -3,13 +3,12 @@ import os
 import shutil
 
 import logging
-# __name__ isn't very exciting / informative in a standalone script
 logger = logging.getLogger('style')
 
 
 def walk(root):
     # flatten into just all the full filepaths
-    for dirpath, dirnames, filenames in os.walk(root):
+    for dirpath, _dirnames, filenames in os.walk(root):
         for filename in filenames:
             yield os.path.join(dirpath, filename)
 
@@ -73,7 +72,7 @@ class Test(MethodRunner):
             for lineno, line in enumerate(fp, 1):
                 if line.rstrip('\n').endswith((' ', '\t')):
                     errors += 1
-                    logger.warn('%s:%d: trailing whitespace', filepath, lineno)
+                    logger.warning('%s:%d: trailing whitespace', filepath, lineno)
 
         return errors
 
@@ -119,13 +118,19 @@ class Fix(MethodRunner):
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(description='Test or apply styles',
+    parser = argparse.ArgumentParser(
+        description='Test or apply styles',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('files', nargs='*', default=['.'], help='Files / directories to read')
-    parser.add_argument('-f', '--fix', action='store_true', help='Fix files that fail tests (potentially destructive, be careful!)')
-    parser.add_argument('-v', '--verbose', action='store_true', help='Print extra information')
-    parser.add_argument('-q', '--quiet', action='store_true', help='Print less information (overrides --verbose)')
-    # parser.add_argument('-a', '--auto', action='store_true', help='Ignore files in .gitignore, etc.')
+    parser.add_argument('files', nargs='*', default=['.'],
+                        help='Files / directories to read')
+    parser.add_argument('-f', '--fix', action='store_true',
+                        help='Fix files that fail tests (potentially destructive, be careful!)')
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='Print extra information')
+    parser.add_argument('-q', '--quiet', action='store_true',
+                        help='Print less information (overrides --verbose)')
+    # parser.add_argument('-a', '--auto', action='store_true',
+    #                     help='Ignore files in .gitignore, etc.')
     opts = parser.parse_args()
 
     # DEBUG=10, WARN=30, ERROR=40
@@ -147,6 +152,7 @@ def main():
             for method_name, fix_result in Fix.__run__(filepath):
                 if fix_result:
                     logger.debug('FIX[%s] %r: %s', method_name, filepath, fix_result)
+
 
 if __name__ == '__main__':
     main()

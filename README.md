@@ -97,61 +97,11 @@ Drop (delete) the first line (or `n` lines, if `n` is specified) of `/dev/stdin`
     ls -l | drop
     ls -la | drop 3
 
-# gh
-
-Open any [GitHub](https://github.com/) pages which the current git repo has as remotes.
-
-    cd ~/scripts
-    gh # opens https://github.com/chbrown/scripts in your browser
-
 # fit
 
 One-liner for when you have some lengthy lines and you want to kill the wrap:
 
     tr '\t' ' ' | cut -c -$(tput cols)
-
-# git-remote-tags
-
-Wrapping around `git ls-remote --tags git://...` to get the good stuff:
-
-    git-remote-tags chbrown/amulet
-
-Assumes github.
-
-# git-submodule-rm
-
-Until git 1.8.3 rolls around:
-
-    git-submodule-rm static/lib
-
-Thanks goes to [stackoverflow](http://stackoverflow.com/questions/1260748/how-do-i-remove-a-git-submodule).
-
-# github-api
-
-Send requests to the GitHub REST API v3 and print responses nicely.
-Automatically pulls in `$GITHUB_TOKEN` environment variable, if available, to authorize requests.
-
-    github-api path /user
-    github-api path /user/emails
-    github-api path /user/issues
-    github-api path /users/isaacs
-    github-api path /orgs/utcompling/members
-    github-api path /repos/chbrown/rfc6902/events | jq
-
-Not yet supported:
-
-    github-api path /repos/chbrown/rfc6902/issues state=closed
-
-Special-purpose subcommands:
-
-**`commits`** gets the first and last 100 commits for a repository.
-This is helpful because it's not easy to find when a repository was started on the GitHub website.
-
-    github-api commits --owner chbrown --repo rfc6902
-
-**`contents`** gets the contents of a file or directory (up to 1000 entries):
-
-    github-api contents --owner chbrown --repo scripts --path /
 
 # grephistory
 

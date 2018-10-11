@@ -1,2 +1,20 @@
 #!/usr/bin/env bash
-wget -e robots=off --recursive --no-clobber --page-requisites --convert-links --restrict-file-names=windows $1
+
+usage() {
+  cat <<HELP
+A shortcut to this wget sequence:
+
+    $(grep ^wget "$0")
+HELP
+}
+
+for arg; do
+  case $arg in
+    -h|--help)
+      usage
+      exit 0
+      ;;
+  esac
+done
+
+wget -e robots=off --recursive --no-clobber --page-requisites --convert-links --restrict-file-names=windows "$1"

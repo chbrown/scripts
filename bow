@@ -1,15 +1,32 @@
 #!/usr/bin/env perl
-if ((-t STDIN && !@ARGV) || grep {$_ eq '--help'} @ARGV) {
-  print STDERR <<EOS
+
+sub usage {
+  my ($status) = @_;
+  print {$status ? STDERR : STDOUT} <<HELP;
 Tabulate bags of words from text supplied on STDIN. Each input line is treated
 as a distinct document and split on whitespace. Prints out each bag of words in
 type:number format, most common first (ordering for types with same total count
-is undefined).
+is undefined). Example:
 
-    Example: bow <browncorpus.txt
-EOS
-;
-  exit 1
+    echo 'the dog bit the man who pet the other dog' | bow
+
+> the:3 dog:2 other:1 who:1 bit:1 man:1 pet:1
+HELP
+  exit $status
+}
+
+# if -h|--help is supplied, show usage and exit successfully
+if (grep(/^-h|--help$/, @ARGV)) {
+  usage 0
+}
+
+# (-t STDIN) is true (zero-ish) iff /dev/stdin is a terminal;
+# it is false (1) if the script is receiving piped input
+
+# if stdin is a terminal or any arguments are supplied,
+# show usage and exit with a failure
+if (-t STDIN || @ARGV) {
+  usage 1
 }
 
 while (my $line = <>) {

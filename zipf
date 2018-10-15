@@ -1,34 +1,46 @@
 #!/usr/bin/env python
+import re
 import sys
 import argparse
-import re
 from collections import Counter
 
-parser = argparse.ArgumentParser(description='Token / type comparator',
-    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('-c', '--case-sensitive', action='store_true', help='retain case')
-parser.add_argument('-t', '--top', default=200, type=int, help='output lines')
-parser.add_argument('-r', '--regex', default=r'\w+', help='token match')
-args = parser.parse_args()
 
-# e.g., use `zipf -r '\S'` to tokenize by character.
+def tokenize(string):
+    '''
+    Find all consecutive sequences of words characters in `string`,
+    yielding strings.
+    '''
+    for match in re.finditer(r'\w+', string, re.UNICODE):
+        yield match.group(0)
 
-wc = 0
-types = Counter()
-# line breaks don't matter, but they are a convenient way to iterate
-for byte_line in sys.stdin:
-    utf8_line = byte_line.decode('utf8')
-    line = utf8_line if args.case_sensitive else utf8_line.lower()
 
-    tokens = re.findall(args.regex, line, re.UNICODE)
+def print_table(counter, n):
+    '''
+    Print out whitespace-aligned table of `n` most common tokens,
+    along with their raw count and overall frequency.
+    '''
+    total = sum(counter.values())
+    print('{:26s} {:7s} {:s}'.format('token', 'count', 'freq'))
+    for token, count in counter.most_common(n):
+        print('{:26s} {:7d} {:8.4%}'.format(token, count, count / total))
 
-    wc += len(tokens)
-    types.update(tokens)
 
-print u'%26s %7s %9s' % ('token', 'count', 'freq')
-for token, count in types.most_common(args.top):
-    # if token.iswhitespace():
-    # else:
-    # repr()[2:-1]
-    term = token
-    print u'%26s %7d %8.4f%%' % (term, count, count * 100.0 / wc)
+def main():
+    parser = argparse.ArgumentParser(
+        description='Token / type comparator',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-t', '--top', default=200, type=int, help='output lines')
+    opts = parser.parse_args()
+
+    counter = Counter()
+    # line breaks don't matter, but they are a convenient way to iterate
+    for line in sys.stdin:
+        tokens = tokenize(line)
+        counter.update(tokens)
+
+    # print report to default output
+    print_table(counter, opts.top)
+
+
+if __name__ == '__main__':
+    main()

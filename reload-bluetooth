@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+usage() {
+  cat <<HELP
+Usage: sudo $(basename "$0")
+
+Unload and then load the Bluetooth kernel extension.
+HELP
+}
+
+for arg; do
+  case $arg in
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      >&2 printf 'Ignoring unrecognized command line argument: "%s"\n' "$1"
+      ;;
+  esac
+done
+
+if [[ $(id -u) != 0 ]]; then
+  >&2 printf 'You must run this as root, not "%s"\n' "$(id -un)"
+fi
+
+kextunload -b com.apple.iokit.BroadcomBluetoothHostControllerUSBTransport
+kextload   -b com.apple.iokit.BroadcomBluetoothHostControllerUSBTransport

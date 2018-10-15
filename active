@@ -1,9 +1,31 @@
-#!/usr/bin/env sed -f
+#!/usr/bin/env bash
+
+usage() {
+  cat <<'HELP'
+Remove inactive lines; i.e., lines that are empty, whitespace-only, or comments.
+Comments are where the first non-whitespace character/string is `#`, `//`, or `--`.
+Example:
+
+    cat /etc/hosts | active
+HELP
+}
+
+for arg; do
+  case $arg in
+    -h|--help)
+      usage
+      exit 0
+      ;;
+  esac
+done
+
 # delete lines beginning with: #
-/^[[:blank:]]*#/d
 # delete lines beginning with: //
-/^[[:blank:]]*\/\//d
 # delete lines beginning with: --
-/^[[:blank:]]*--/d
 # delete empty lines
-/^[[:blank:]]*$/d
+sed \
+-e '/^[[:blank:]]*#/d' \
+-e '/^[[:blank:]]*\/\//d' \
+-e '/^[[:blank:]]*--/d' \
+-e '/^[[:blank:]]*$/d' \
+"$@"

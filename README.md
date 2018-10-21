@@ -432,12 +432,6 @@ Secure move. Like scp but remove the files after copying.
 
     smv 2013-09-07.json.gz 2013-09-08.json.gz /mnt/backup/days_and_days --delete
 
-# statuses
-
-Give it the directories of your git repositories and it'll run `git status` on them all and colorize them and tell you which ones need committing and pushing.
-
-    statuses ~/github/*/
-
 # stopwatch
 
 Basic duration timer.

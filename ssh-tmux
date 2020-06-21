@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 if [[ "${@---help}" =~ '--help' ]]; then
   >&2 cat <<HELP
-Usage: stmux chbrown@dark
+Usage: ssh-tmux chbrown@dark
 
 For use with iTerm2 v3 with tmux integration.
 

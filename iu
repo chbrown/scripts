@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  >&2 cat <<HELP
+Usage: $(basename "$0") [filepath [...]]
+
+Like 'du -s ...' but counts inodes rather than blocks.
+
+If no arguments are provided, defaults to list of directories
+that are immediate children of the current working directory.
+HELP
+}
+
+TOPS=()
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      TOPS+=("$1")
+      ;;
+  esac
+  shift
+done
+
+# use gfind if it's available
+if command -v gfind >/dev/null 2>&1; then
+  # FIXME: there's probably a better way to support multiple platforms
+  shopt -s expand_aliases
+  alias find=gfind
+fi
+
+if [[ ${#TOPS[@]} -eq 0 ]]; then
+  mapfile -t TOPS < <(find . -mindepth 1 -maxdepth 1 -type d -printf '%f\n')
+fi
+
+for TOP in "${TOPS[@]}"; do
+  printf '%d\t%s\n' "$(find "$TOP" -printf 0 | wc -c)" "$TOP"
+done

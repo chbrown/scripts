@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  >&2 cat <<HELP
+Usage: $(basename "$0") [dir [...]]
+
+Delete all '.DS_Store' files within the given directories,
+or if none are specified, within the current working directory.
+HELP
+}
+
+TOPS=()
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      TOPS+=("$1")
+      ;;
+  esac
+  shift
+done
+
+if [[ ${#TOPS[@]} -eq 0 ]]; then
+  TOPS=(.)
+fi
+find "${TOPS[@]}" -name .DS_Store -delete

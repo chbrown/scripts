@@ -60,17 +60,6 @@ while [[ $# -gt 0 ]]; do
   shift
 done
 
-move() {
-  # Usage: move source-file target-file
-  #
-  # if 'link' fails (e.g., due to a 'Cross-device link' error), fall back to 'mv'
-  if link "$1" "$2"; then
-    unlink "$1"
-  else
-    mv "$1" "$2"
-  fi
-}
-
 compress-dir() {
   # Usage: compress-dir input-directory output-filepath
   #
@@ -79,6 +68,7 @@ compress-dir() {
   TIMESTAMP=$(find "$1" -type f -print0 | xargs -0 stat -f %SB -t %Y%m%d%H%M.%S | sort | tail -1)
   # prepare temporary file to write to
   TMPFILE=$(mktemp -d)/$(basename "$2")
+  trap "unlink $TMPFILE" EXIT
   # COPYFILE_DISABLE=1 ignores extended attributes (xattr) on Mac OS X
   # -c create a new archive
   # -j compress with bzip2 / -z compress with gzip
@@ -90,8 +80,10 @@ compress-dir() {
     --exclude .DS_Store \
     --exclude ._.DS_Store \
     "$1"
-  # move into place
-  move "$TMPFILE" "$2"
+  # move into place; if 'link' fails (e.g., due to a 'Cross-device link' error), fall back to 'cp'
+  if ! link "$TMPFILE" "$2"; then
+    cp "$TMPFILE" "$2"
+  fi
   touch -t "$TIMESTAMP" "$2"
   >&2 printf 'created "%s" from contents of "%s"\n' "$2" "$1"
 }
@@ -127,7 +119,6 @@ if ! $KEEP; then
     trash -v "$INPUT"
   else
     >&2 printf 'moving original to temporary directory...\n'
-    # don't use move() since $INPUT is a directory
     mv -v "$INPUT" "$(mktemp -d)"
   fi
 fi

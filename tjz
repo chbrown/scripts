@@ -4,17 +4,16 @@ set -e # exit on first command that fails
 
 usage() {
   >&2 cat <<HELP
-Usage: $(basename "$0") DIRPATH[/] [-g|--gzip] [-k|--keep] [-p|--prefix] [-h|--help]
+Usage: $(basename "$0") INPUT[/] [-g|--gzip] [-k|--keep] [-p|--prefix] [-h|--help]
 
-Tarball and bzip2-compress DIRPATH into a new file, "./DIRPATH.tar.bz2",
-then remove the original directory (using 'trash' if available; otherwise,
-move it into \$TMPDIR).
+Tarball and compress INPUT into a file named like "INPUT.tar.bz2", then remove INPUT
+(using 'trash' if available; otherwise, move it into \$TMPDIR).
 
 Options:
   -g, --gzip    Use gzip instead of bzip2 compression
-  -k, --keep    Keep (don't trash) the input directory
-  -p, --prefix  Prefix the created tarball with the original directory's
-                date-of-birth, using the pattern "YYYYMMDD-"
+  -k, --keep    Keep INPUT instead of trashing it
+  -p, --prefix  Prefix the created tarball with INPUT's birthtime,
+                using the pattern "YYYYMMDD-"
   -h, --help    Show this usage message
 HELP
 }
@@ -39,12 +38,9 @@ while [[ $# -gt 0 ]]; do
       PREFIX_PATTERN=%Y%m%d-
       ;;
     *)
-      # check that the given filepath exists and that it's a directory
+      # check that the given filepath exists
       if [[ ! -e $1 ]]; then
         >&2 printf '"%s" does not exist.\n' "$1"
-        exit 1
-      elif [[ ! -d $1 ]]; then
-        >&2 printf '"%s" is not a directory.\n' "$1"
         exit 1
       elif [[ -z ${INPUT+missing} ]]; then
         # INPUT hasn't been set yet; set it while removing

@@ -67,7 +67,7 @@ compress-dir() {
   #   touch's -t argument is of the form "[[CC]YY]MMDDhhmm[.SS]"
   TIMESTAMP=$(find "$1" -type f -print0 | xargs -0 stat -f %SB -t %Y%m%d%H%M.%S | sort | tail -1)
   # prepare temporary file to write to
-  TMPFILE=$(mktemp -d)/$(basename "$2")
+  TMPFILE=$(mktemp "$2.XXXXXXXXXX")
   trap "unlink $TMPFILE" EXIT
   # COPYFILE_DISABLE=1 ignores extended attributes (xattr) on Mac OS X
   # -c create a new archive
@@ -84,6 +84,8 @@ compress-dir() {
   if ! link "$TMPFILE" "$2"; then
     cp "$TMPFILE" "$2"
   fi
+  # set file mode to defaults (mktemp zeroes out all group/other bits)
+  chmod =rw "$2"
   touch -t "$TIMESTAMP" "$2"
   >&2 printf 'created "%s" from contents of "%s"\n' "$2" "$1"
 }

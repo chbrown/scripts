@@ -74,6 +74,9 @@ move() {
 compress-dir() {
   # Usage: compress-dir input-directory output-filepath
   #
+  # prepare timestamp to apply to output-filepath
+  #   touch's -t argument is of the form "[[CC]YY]MMDDhhmm[.SS]"
+  TIMESTAMP=$(find "$1" -type f -print0 | xargs -0 stat -f %SB -t %Y%m%d%H%M.%S | sort | tail -1)
   # prepare temporary file to write to
   TMPFILE=$(mktemp -d)/$(basename "$2")
   # COPYFILE_DISABLE=1 ignores extended attributes (xattr) on Mac OS X
@@ -89,6 +92,7 @@ compress-dir() {
     "$1"
   # move into place
   move "$TMPFILE" "$2"
+  touch -t "$TIMESTAMP" "$2"
   >&2 printf 'created "%s" from contents of "%s"\n' "$2" "$1"
 }
 

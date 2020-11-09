@@ -65,7 +65,7 @@ compress-dir() {
   #
   # prepare timestamp to apply to output-filepath
   #   touch's -t argument is of the form "[[CC]YY]MMDDhhmm[.SS]"
-  TIMESTAMP=$(find "$1" -type f -print0 | xargs -0 stat -f %SB -t %Y%m%d%H%M.%S | sort | tail -1)
+  TIMESTAMP=$(find "$1" -type f -not -name .DS_Store -print0 | xargs -0 stat -f %SB -t %Y%m%d%H%M.%S | sort | tail -1)
   # prepare temporary file to write to
   TMPFILE=$(mktemp "$2.XXXXXXXXXX")
   trap "unlink $TMPFILE" EXIT

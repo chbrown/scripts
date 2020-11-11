@@ -4,9 +4,9 @@ set -e # exit on first command that fails
 
 usage() {
   >&2 cat <<HELP
-Usage: $(basename "$0") INPUT[/] [-g|--gzip] [-k|--keep] [-p|--prefix] [-h|--help]
+Usage: $(basename "$0") INPUT[/] [INPUT [...]] [-g|--gzip] [-k|--keep] [-p|--prefix] [-h|--help]
 
-Tarball and compress INPUT into a file named like "INPUT.tar.bz2", then remove INPUT
+Tarball and compress each INPUT into a file named like "INPUT.tar.bz2", then remove INPUT
 (using 'trash' if available; otherwise, move it into \$TMPDIR).
 
 Options:
@@ -18,6 +18,7 @@ Options:
 HELP
 }
 
+INPUTS=()
 SUFFIX=bz2
 COMPRESSOR=-j
 KEEP=false
@@ -42,14 +43,9 @@ while [[ $# -gt 0 ]]; do
       if [[ ! -e $1 ]]; then
         >&2 printf '"%s" does not exist.\n' "$1"
         exit 1
-      elif [[ -z ${INPUT+missing} ]]; then
-        # INPUT hasn't been set yet; set it while removing
-        # the trailing slash (hopefully there's only one)
-        INPUT=${1%/}
       else
-        usage
-        >&2 printf '\nToo many arguments: "%s"\n' "$1"
-        exit 1
+        # add INPUT while removing the trailing slash (hopefully there's only one)
+        INPUTS+=("${1%/}")
       fi
       ;;
   esac
@@ -115,18 +111,18 @@ trash-or-move-to-tmpdir() {
   >&2 printf ' done!\n'
 }
 
-OUTPUT=$(format-output "$INPUT")
+for INPUT in "${INPUTS[@]}"; do
+  OUTPUT=$(format-output "$INPUT")
 
-# check that the eventual output does not exist
-if [[ -e "$OUTPUT" ]]; then
-  >&2 printf '"%s" already exists; not overwriting.\n' "$OUTPUT"
-  exit 1
-fi
-
-# run main procedure
-compress-dir "$INPUT" "$OUTPUT"
-
-# clean up
-if ! $KEEP; then
-  trash-or-move-to-tmpdir "$INPUT"
-fi
+  # check that the eventual output does not exist
+  if [[ -e "$OUTPUT" ]]; then
+    >&2 printf '"%s" already exists; not overwriting.\n' "$OUTPUT"
+  else
+    # run main procedure
+    compress-dir "$INPUT" "$OUTPUT"
+    # clean up
+    if ! $KEEP; then
+      trash-or-move-to-tmpdir "$INPUT"
+    fi
+  fi
+done

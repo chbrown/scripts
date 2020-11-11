@@ -98,6 +98,23 @@ format-output() {
   printf '%s%s.tar.%s' "$PREFIX" "$1" "$SUFFIX"
 }
 
+trash-or-move-to-tmpdir() {
+  # Usage: trash-or-move-to-tmpdir original-file
+  #
+  # use the 'trash' command if there is one
+  if command -v trash >/dev/null 2>&1; then
+    >&2 printf 'trashing %s ...' "$1"
+    trash "$1"
+  else
+    # otherwise, create a new temporary directory and move the original there,
+    # where it will (presumably) be flushed upon next system reboot
+    temporary_directory=$(mktemp -d)
+    >&2 printf 'moving %s to temporary directory (%s) ...' "$1" "$temporary_directory"
+    mv "$1" "$temporary_directory"
+  fi
+  >&2 printf ' done!\n'
+}
+
 OUTPUT=$(format-output "$INPUT")
 
 # check that the eventual output does not exist
@@ -111,12 +128,5 @@ compress-dir "$INPUT" "$OUTPUT"
 
 # clean up
 if ! $KEEP; then
-  # use the 'trash' command if there is one
-  if command -v trash >/dev/null 2>&1; then
-    >&2 printf 'trashing ... '
-    trash -v "$INPUT"
-  else
-    >&2 printf 'moving original to temporary directory...\n'
-    mv -v "$INPUT" "$(mktemp -d)"
-  fi
+  trash-or-move-to-tmpdir "$INPUT"
 fi
